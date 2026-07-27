@@ -15,6 +15,14 @@
 
 ## Critical Constraints — Read Before Touching Anything
 
+> [!WARNING]
+> ### 0. ⚠️ REUSING THIS TEMPLATE FOR A NEW RESTAURANT (FIRST STEP!)
+> If you (or an AI assistant) are adapting or cloning this repository for a **new restaurant client**, the VERY FIRST ACTION must be:
+> 1. **Update / Remove Hardcoded Keep-Alive Fallbacks**: In `.github/workflows/keep-supabase-alive.yml`, replace the hardcoded fallback Supabase URL (`mertfuqvcqidwbqdjzle.supabase.co`) and Anon Key, OR set GitHub Repository Secrets (`NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY`).
+> 2. **Update Environment Variables**: Put the new project's URL and Anon Key in `.env.local` and Vercel settings.
+> 3. **Update Seed Data & Branding**: Replace `INITIAL_CATEGORIES` and `INITIAL_MENU_ITEMS` in `lib/db.ts`, and update restaurant name/address in `components/public/Header.tsx` and `components/public/Footer.tsx`.
+> 4. **Update Admin PIN**: Change passcode in `app/admin/login/page.tsx` (default `2002`).
+
 ### 1. PIN Code
 The admin dashboard is protected by PIN `2002`. This is hardcoded in `app/admin/login/page.tsx`. **Do not change it without explicit user instruction.**
 

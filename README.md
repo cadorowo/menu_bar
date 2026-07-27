@@ -15,6 +15,24 @@ This is a full-stack Next.js 14 application that powers the digital menu for **B
 
 ---
 
+> [!WARNING]
+> ### ⚠️ REUSING THIS PROJECT FOR A NEW RESTAURANT? READ THIS FIRST!
+> 
+> If you clone or adapt this repository for a **new restaurant**, you MUST update/remove the hardcoded fallbacks and metadata **first**:
+> 
+> 1. **Remove / Update GitHub Action Keep-Alive Fallbacks** ([`.github/workflows/keep-supabase-alive.yml`](./.github/workflows/keep-supabase-alive.yml)):
+>    Lines 19-20 contain hardcoded fallback credentials (`mertfuqvcqidwbqdjzle.supabase.co`). Replace them with your new Supabase URL and anon key, OR set `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` under **GitHub Repository Settings → Secrets and variables → Actions**.
+> 
+> 2. **Update Environment Variables** (`.env.local` & Vercel):
+>    Set your new project's `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY`.
+> 
+> 3. **Update Restaurant Identity & Content**:
+>    - **Header & Footer**: Update restaurant name, address, hours, and phone in [`components/public/Header.tsx`](./components/public/Header.tsx) and [`components/public/Footer.tsx`](./components/public/Footer.tsx).
+>    - **Admin PIN**: Change passcode in [`app/admin/login/page.tsx`](./app/admin/login/page.tsx) (default: `2002`).
+>    - **Seed Menu Items**: Replace default categories & dishes in [`lib/db.ts`](./lib/db.ts) (`INITIAL_CATEGORIES` & `INITIAL_MENU_ITEMS`).
+
+---
+
 ## Tech Stack
 
 | Layer | Technology |
