@@ -21,16 +21,24 @@ export default function PublicMenuPage() {
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    const loadedCategories = Store.getCategories()
-      .filter((c) => c.active)
-      .sort((a, b) => a.sort_order - b.sort_order);
-    const loadedItems = Store.getMenuItems()
-      .filter((i) => i.active)
-      .sort((a, b) => a.sort_order - b.sort_order);
+    async function loadData() {
+      const loadedCategories = await Store.fetchCategoriesFromSupabase();
+      const loadedItems = await Store.fetchMenuItemsFromSupabase();
 
-    setCategories(loadedCategories);
-    setMenuItems(loadedItems);
-    setLoading(false);
+      const activeCategories = loadedCategories
+        .filter((c) => c.active)
+        .sort((a, b) => a.sort_order - b.sort_order);
+
+      const activeItems = loadedItems
+        .filter((i) => i.active)
+        .sort((a, b) => a.sort_order - b.sort_order);
+
+      setCategories(activeCategories);
+      setMenuItems(activeItems);
+      setLoading(false);
+    }
+
+    loadData();
   }, []);
 
   const handleSelectCategory = (id: string) => {

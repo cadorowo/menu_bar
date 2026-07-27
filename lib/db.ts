@@ -214,6 +214,30 @@ export class Store {
     }
   }
 
+  static async fetchCategoriesFromSupabase(): Promise<Category[]> {
+    if (!supabase || !isSupabaseConfigured) {
+      return this.getCategories();
+    }
+    try {
+      const { data, error } = await supabase.from('categories').select('*').order('sort_order', { ascending: true });
+      if (error || !data || data.length === 0) {
+        return this.getCategories();
+      }
+      const mapped: Category[] = data.map((item) => ({
+        id: String(item.id),
+        name: typeof item.name === 'string' ? JSON.parse(item.name) : item.name,
+        sort_order: item.sort_order || 1,
+        active: item.active !== undefined ? item.active : true,
+      }));
+      if (typeof window !== 'undefined') {
+        localStorage.setItem(STORAGE_KEYS.CATEGORIES, JSON.stringify(mapped));
+      }
+      return mapped;
+    } catch {
+      return this.getCategories();
+    }
+  }
+
   static saveCategories(categories: Category[]) {
     if (typeof window !== 'undefined') {
       localStorage.setItem(STORAGE_KEYS.CATEGORIES, JSON.stringify(categories));
@@ -232,7 +256,7 @@ export class Store {
             { onConflict: 'id' }
           )
         )
-      ).catch((err) => console.log('Supabase sync categories notice:', err));
+      ).catch((err) => console.warn('Supabase sync categories notice:', err));
     }
   }
 
@@ -247,6 +271,36 @@ export class Store {
       return JSON.parse(stored);
     } catch {
       return INITIAL_MENU_ITEMS;
+    }
+  }
+
+  static async fetchMenuItemsFromSupabase(): Promise<MenuItem[]> {
+    if (!supabase || !isSupabaseConfigured) {
+      return this.getMenuItems();
+    }
+    try {
+      const { data, error } = await supabase.from('menu_items').select('*').order('sort_order', { ascending: true });
+      if (error || !data || data.length === 0) {
+        return this.getMenuItems();
+      }
+      const mapped: MenuItem[] = data.map((item) => ({
+        id: String(item.id),
+        category_id: String(item.category_id),
+        name: typeof item.name === 'string' ? JSON.parse(item.name) : item.name,
+        description: typeof item.description === 'string' ? JSON.parse(item.description) : item.description,
+        price: Number(item.price) || 0,
+        photo_url: item.photo_url || null,
+        allergens: Array.isArray(item.allergens) ? item.allergens : [],
+        sold_out: Boolean(item.sold_out),
+        sort_order: item.sort_order || 1,
+        active: item.active !== undefined ? item.active : true,
+      }));
+      if (typeof window !== 'undefined') {
+        localStorage.setItem(STORAGE_KEYS.ITEMS, JSON.stringify(mapped));
+      }
+      return mapped;
+    } catch {
+      return this.getMenuItems();
     }
   }
 
@@ -274,7 +328,7 @@ export class Store {
             { onConflict: 'id' }
           )
         )
-      ).catch((err) => console.log('Supabase sync items notice:', err));
+      ).catch((err) => console.warn('Supabase sync items notice:', err));
     }
   }
 
