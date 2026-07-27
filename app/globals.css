@@ -1,0 +1,49 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    background-color: #FAF7F2;
+    color: #1E1B18;
+    font-family: "Plus Jakarta Sans", system-ui, -apple-system, sans-serif;
+  }
+}
+
+/* Custom subtle paper texture motif */
+.bg-paper-pattern {
+  background-color: #FAF7F2;
+  background-image: radial-gradient(#E8E2D8 0.75px, transparent 0.75px);
+  background-size: 16px 16px;
+}
+
+/* Custom scrollbar hiding for horizontal category bar */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Category Tab Snap behavior */
+.snap-x-container {
+  scroll-snap-type: x mandatory;
+}
+.snap-tab {
+  scroll-snap-align: start;
+}
+
+@keyframes floatGentle {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-3px); }
+}
+
+.animate-float {
+  animation: floatGentle 4s ease-in-out infinite;
+}
