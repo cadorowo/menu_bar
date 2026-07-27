@@ -11,7 +11,6 @@ import {
   X,
   AlertTriangle,
   Save,
-  Globe,
 } from 'lucide-react';
 import { Category, MenuItem } from '@/lib/types';
 import { Store } from '@/lib/db';
@@ -149,20 +148,20 @@ export default function CategoryManagementPage() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6 font-sans">
+    <div className="max-w-4xl mx-auto space-y-5 sm:space-y-6 font-sans">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-extrabold text-stone-900 tracking-tight font-serif">
+          <h1 className="text-xl sm:text-2xl font-extrabold text-stone-900 tracking-tight font-serif">
             Gestione Categorie
           </h1>
-          <p className="text-xs text-stone-500 mt-1">
+          <p className="text-xs text-stone-500 mt-0.5 sm:mt-1">
             Riordina, aggiungi o modifica le sezioni del menu digitale.
           </p>
         </div>
         <button
           onClick={handleOpenAdd}
-          className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-gradient-to-r from-aperitivo-spritz to-aperitivo-vermilion hover:opacity-95 text-white font-bold text-xs rounded-xl shadow-md transition-all active:scale-95 cursor-pointer"
+          className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-4 py-2.5 bg-gradient-to-r from-aperitivo-spritz to-aperitivo-vermilion hover:opacity-95 text-white font-bold text-xs rounded-xl shadow-md transition-all active:scale-95 cursor-pointer"
         >
           <Plus className="w-4 h-4" />
           <span>Nuova Categoria</span>
@@ -177,26 +176,27 @@ export default function CategoryManagementPage() {
           return (
             <div
               key={cat.id}
-              className="p-4 flex items-center justify-between gap-4 hover:bg-stone-50/50 transition-colors"
+              className="p-3.5 sm:p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 hover:bg-stone-50/50 transition-colors"
             >
               {/* Category Info */}
               <div className="flex items-center gap-3 min-w-0">
-                <div className="flex flex-col gap-1">
+                {/* Large Touch Up/Down Reorder Controls */}
+                <div className="flex flex-row sm:flex-col gap-1">
                   <button
                     onClick={() => handleMove(index, 'up')}
                     disabled={index === 0}
-                    className="p-1 rounded text-stone-400 hover:text-stone-700 disabled:opacity-30"
+                    className="p-1.5 sm:p-1 rounded bg-stone-100 sm:bg-transparent text-stone-600 hover:text-stone-900 disabled:opacity-30"
                     title="Sposta in alto"
                   >
-                    <ArrowUp className="w-3.5 h-3.5" />
+                    <ArrowUp className="w-4 h-4 sm:w-3.5 sm:h-3.5" />
                   </button>
                   <button
                     onClick={() => handleMove(index, 'down')}
                     disabled={index === categories.length - 1}
-                    className="p-1 rounded text-stone-400 hover:text-stone-700 disabled:opacity-30"
+                    className="p-1.5 sm:p-1 rounded bg-stone-100 sm:bg-transparent text-stone-600 hover:text-stone-900 disabled:opacity-30"
                     title="Sposta in basso"
                   >
-                    <ArrowDown className="w-3.5 h-3.5" />
+                    <ArrowDown className="w-4 h-4 sm:w-3.5 sm:h-3.5" />
                   </button>
                 </div>
 
@@ -204,18 +204,18 @@ export default function CategoryManagementPage() {
                   {cat.sort_order}
                 </div>
 
-                <div className="min-w-0">
+                <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2 flex-wrap">
                     <h3 className="text-sm font-bold text-stone-900 truncate">
                       {cat.name.it}
                     </h3>
                     {cat.name.en && (
-                      <span className="text-[11px] text-stone-400 font-medium">
+                      <span className="text-[10px] sm:text-[11px] text-stone-400 font-medium">
                         EN: {cat.name.en}
                       </span>
                     )}
                     {cat.name.fr && (
-                      <span className="text-[11px] text-stone-400 font-medium">
+                      <span className="text-[10px] sm:text-[11px] text-stone-400 font-medium">
                         FR: {cat.name.fr}
                       </span>
                     )}
@@ -226,11 +226,11 @@ export default function CategoryManagementPage() {
                 </div>
               </div>
 
-              {/* Actions */}
-              <div className="flex items-center gap-2">
+              {/* Actions & Status */}
+              <div className="flex items-center justify-between sm:justify-end gap-2 pt-2 sm:pt-0 border-t sm:border-t-0 border-stone-100">
                 <button
                   onClick={() => toggleActive(cat.id)}
-                  className={`px-3 py-1 rounded-full text-xs font-bold transition-colors ${
+                  className={`px-3 py-1.5 rounded-full text-xs font-bold transition-colors ${
                     cat.active
                       ? 'bg-emerald-100 text-emerald-800'
                       : 'bg-stone-200 text-stone-600'
@@ -239,19 +239,23 @@ export default function CategoryManagementPage() {
                   {cat.active ? 'Attiva' : 'Nascosta'}
                 </button>
 
-                <button
-                  onClick={() => handleOpenEdit(cat)}
-                  className="p-2 text-stone-600 hover:text-stone-900 hover:bg-stone-100 rounded-lg transition-colors"
-                >
-                  <Edit2 className="w-4 h-4" />
-                </button>
+                <div className="flex items-center gap-1">
+                  <button
+                    onClick={() => handleOpenEdit(cat)}
+                    className="p-2 text-stone-600 hover:text-stone-900 hover:bg-stone-100 rounded-lg transition-colors"
+                    title="Modifica categoria"
+                  >
+                    <Edit2 className="w-4 h-4" />
+                  </button>
 
-                <button
-                  onClick={() => setDeleteConfirmId(cat.id)}
-                  className="p-2 text-rose-500 hover:text-rose-700 hover:bg-rose-50 rounded-lg transition-colors"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </button>
+                  <button
+                    onClick={() => setDeleteConfirmId(cat.id)}
+                    className="p-2 text-rose-500 hover:text-rose-700 hover:bg-rose-50 rounded-lg transition-colors"
+                    title="Elimina categoria"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
             </div>
           );
@@ -261,14 +265,14 @@ export default function CategoryManagementPage() {
       {/* Add / Edit Category Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-stone-900/60 backdrop-blur-xs p-4 font-sans">
-          <div className="bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden p-6 space-y-4 border border-stone-200">
+          <div className="bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden p-5 sm:p-6 space-y-4 border border-stone-200">
             <div className="flex items-center justify-between border-b border-stone-200 pb-3">
               <h3 className="text-base font-bold text-stone-900">
                 {editingCategory ? 'Modifica Categoria' : 'Nuova Categoria'}
               </h3>
               <button
                 onClick={() => setIsModalOpen(false)}
-                className="text-stone-400 hover:text-stone-600"
+                className="text-stone-400 hover:text-stone-600 p-1"
               >
                 <X className="w-5 h-5" />
               </button>

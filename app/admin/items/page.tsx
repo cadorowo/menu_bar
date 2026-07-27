@@ -10,10 +10,8 @@ import {
   Trash2,
   AlertTriangle,
   CheckCircle2,
-  XCircle,
   Eye,
   EyeOff,
-  Flame,
   Check,
   Ban,
 } from 'lucide-react';
@@ -131,7 +129,7 @@ export default function MenuItemsManagementPage() {
     const matchesSearch =
       item.name.it.toLowerCase().includes(searchQuery.toLowerCase()) ||
       (item.name.en && item.name.en.toLowerCase().includes(searchQuery.toLowerCase()));
-    
+
     let matchesAvailability = true;
     if (availabilityFilter === 'available') matchesAvailability = !item.sold_out;
     if (availabilityFilter === 'sold_out') matchesAvailability = item.sold_out;
@@ -144,20 +142,20 @@ export default function MenuItemsManagementPage() {
   const soldOutCount = items.filter((i) => i.sold_out).length;
 
   return (
-    <div className="max-w-6xl mx-auto space-y-6 font-sans">
+    <div className="max-w-6xl mx-auto space-y-5 sm:space-y-6 font-sans">
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-extrabold text-stone-900 tracking-tight font-serif">
+          <h1 className="text-xl sm:text-2xl font-extrabold text-stone-900 tracking-tight font-serif">
             Gestione Piatti & Prodotti
           </h1>
-          <p className="text-xs text-stone-500 mt-1">
+          <p className="text-xs text-stone-500 mt-0.5 sm:mt-1">
             Aggiorna in tempo reale disponibilità, prezzi, allergeni e foto.
           </p>
         </div>
         <button
           onClick={handleOpenAdd}
-          className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-gradient-to-r from-aperitivo-spritz to-aperitivo-vermilion hover:opacity-95 text-white font-bold text-xs rounded-xl shadow-md transition-all active:scale-95 cursor-pointer"
+          className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-4 py-2.5 bg-gradient-to-r from-aperitivo-spritz to-aperitivo-vermilion hover:opacity-95 text-white font-bold text-xs rounded-xl shadow-md transition-all active:scale-95 cursor-pointer"
         >
           <Plus className="w-4 h-4" />
           <span>Aggiungi Nuovo Piatto</span>
@@ -168,18 +166,18 @@ export default function MenuItemsManagementPage() {
       <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
         <button
           onClick={() => setAvailabilityFilter('all')}
-          className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all ${
+          className={`flex-shrink-0 px-3.5 py-1.5 rounded-full text-xs font-bold transition-all ${
             availabilityFilter === 'all'
               ? 'bg-stone-900 text-white shadow-xs'
               : 'bg-white text-stone-600 hover:bg-stone-200 border border-stone-200'
           }`}
         >
-          Tutti i Prodotti ({totalCount})
+          Tutti ({totalCount})
         </button>
 
         <button
           onClick={() => setAvailabilityFilter('available')}
-          className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all flex items-center gap-1.5 ${
+          className={`flex-shrink-0 px-3.5 py-1.5 rounded-full text-xs font-bold transition-all flex items-center gap-1.5 ${
             availabilityFilter === 'available'
               ? 'bg-emerald-600 text-white shadow-xs'
               : 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200'
@@ -191,19 +189,19 @@ export default function MenuItemsManagementPage() {
 
         <button
           onClick={() => setAvailabilityFilter('sold_out')}
-          className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all flex items-center gap-1.5 ${
+          className={`flex-shrink-0 px-3.5 py-1.5 rounded-full text-xs font-bold transition-all flex items-center gap-1.5 ${
             availabilityFilter === 'sold_out'
               ? 'bg-amber-600 text-white shadow-xs'
               : 'bg-amber-50 text-amber-800 hover:bg-amber-100 border border-amber-300'
           }`}
         >
           <Ban className="w-3.5 h-3.5" />
-          <span>Esauriti / Sold Out ({soldOutCount})</span>
+          <span>Esauriti ({soldOutCount})</span>
         </button>
       </div>
 
       {/* Filter & Search Bar */}
-      <div className="bg-white p-4 rounded-2xl border border-stone-200 shadow-2xs flex flex-col sm:flex-row items-center gap-4">
+      <div className="bg-white p-3.5 sm:p-4 rounded-2xl border border-stone-200 shadow-2xs flex flex-col sm:flex-row items-center gap-3 sm:gap-4">
         {/* Search */}
         <div className="relative flex-1 w-full">
           <Search className="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
@@ -218,7 +216,7 @@ export default function MenuItemsManagementPage() {
 
         {/* Category Selector */}
         <div className="flex items-center gap-2 w-full sm:w-auto">
-          <Filter className="w-4 h-4 text-stone-400" />
+          <Filter className="w-4 h-4 text-stone-400 flex-shrink-0" />
           <select
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
@@ -234,8 +232,137 @@ export default function MenuItemsManagementPage() {
         </div>
       </div>
 
-      {/* Items Table */}
-      <div className="bg-white rounded-2xl border border-stone-200 shadow-2xs overflow-hidden">
+      {/* MOBILE TOUCH CARD LIST VIEW (< 768px md:hidden) */}
+      <div className="block md:hidden space-y-3">
+        {filteredItems.map((item) => {
+          const category = categories.find((c) => c.id === item.category_id);
+          const hasNoAllergens = !item.allergens || item.allergens.length === 0;
+
+          return (
+            <div
+              key={item.id}
+              className={`bg-white p-4 rounded-2xl border transition-all space-y-3 shadow-2xs ${
+                item.sold_out
+                  ? 'border-amber-300 bg-amber-50/20'
+                  : 'border-stone-200'
+              }`}
+            >
+              {/* Header: Name, Category, Price & Photo */}
+              <div className="flex items-start gap-3">
+                {item.photo_url ? (
+                  <img
+                    src={item.photo_url}
+                    alt=""
+                    className="w-14 h-14 rounded-xl object-cover border border-stone-200 flex-shrink-0"
+                  />
+                ) : (
+                  <div className="w-14 h-14 rounded-xl bg-aperitivo-linen border border-stone-200 flex items-center justify-center text-stone-400 font-extrabold text-sm flex-shrink-0">
+                    {item.name.it.substring(0, 2).toUpperCase()}
+                  </div>
+                )}
+
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-start justify-between gap-2">
+                    <h3 className="font-bold text-sm text-stone-900 leading-snug">
+                      {item.name.it}
+                    </h3>
+                    <span className="font-serif text-sm font-bold text-aperitivo-spritz flex-shrink-0">
+                      € {item.price.toFixed(2)}
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-stone-500 font-semibold mt-0.5">
+                    {category ? category.name.it : '—'}
+                  </p>
+                </div>
+              </div>
+
+              {/* Allergen Badges Row */}
+              <div className="pt-1 flex items-center gap-1.5 flex-wrap">
+                {hasNoAllergens ? (
+                  <span className="inline-flex items-center gap-1 text-[10px] font-bold text-rose-700 bg-rose-50 px-2 py-0.5 rounded-full border border-rose-200">
+                    <AlertTriangle className="w-3 h-3" />
+                    Allergeni da verificare
+                  </span>
+                ) : (
+                  item.allergens.map((code) => (
+                    <span
+                      key={code}
+                      className="px-2 py-0.5 rounded-md bg-stone-100 border border-stone-200 text-[10px] uppercase font-bold text-stone-700 flex items-center gap-1"
+                    >
+                      <AllergenSvgIcon code={code} size={12} />
+                      <span>{code.substring(0, 2)}</span>
+                    </span>
+                  ))
+                )}
+              </div>
+
+              {/* Mobile Actions & 1-Click Sold Out Button */}
+              <div className="pt-2 border-t border-stone-100 flex items-center justify-between gap-2">
+                {/* 1-Click Sold Out Toggle Button */}
+                <button
+                  type="button"
+                  onClick={() => handleToggleSoldOut(item.id)}
+                  className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-extrabold uppercase transition-all shadow-2xs active:scale-95 cursor-pointer ${
+                    item.sold_out
+                      ? 'bg-amber-600 hover:bg-amber-700 text-white shadow-amber-600/20'
+                      : 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-600/20'
+                  }`}
+                >
+                  {item.sold_out ? (
+                    <>
+                      <Ban className="w-4 h-4" />
+                      <span>Esaurito</span>
+                    </>
+                  ) : (
+                    <>
+                      <Check className="w-4 h-4 stroke-[3]" />
+                      <span>Disponibile</span>
+                    </>
+                  )}
+                </button>
+
+                {/* Edit, Hide, Delete triggers */}
+                <div className="flex items-center gap-1">
+                  <button
+                    onClick={() => handleToggleActive(item.id)}
+                    className="p-2 rounded-xl bg-stone-100 text-stone-600 hover:bg-stone-200 transition-colors"
+                    title={item.active ? 'Nascondi nel menu' : 'Mostra nel menu'}
+                  >
+                    {item.active ? (
+                      <Eye className="w-4 h-4 text-emerald-600" />
+                    ) : (
+                      <EyeOff className="w-4 h-4 text-stone-400" />
+                    )}
+                  </button>
+                  <button
+                    onClick={() => handleOpenEdit(item)}
+                    className="p-2 rounded-xl bg-stone-100 text-stone-700 hover:bg-stone-200 transition-colors"
+                    title="Modifica piatto"
+                  >
+                    <Edit2 className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => handleDelete(item.id)}
+                    className="p-2 rounded-xl bg-rose-50 text-rose-600 hover:bg-rose-100 transition-colors"
+                    title="Elimina piatto"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          );
+        })}
+
+        {filteredItems.length === 0 && (
+          <div className="p-8 text-center text-stone-400 bg-white rounded-2xl border border-stone-200 font-medium text-xs">
+            Nessun prodotto trovato con i filtri selezionati.
+          </div>
+        )}
+      </div>
+
+      {/* DESKTOP TABLE VIEW (>= 768px hidden md:block) */}
+      <div className="hidden md:block bg-white rounded-2xl border border-stone-200 shadow-2xs overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
             <thead className="bg-stone-50 border-b border-stone-200 text-stone-600 font-bold uppercase tracking-wider text-[10px]">

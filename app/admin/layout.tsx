@@ -45,15 +45,15 @@ export default function AdminLayout({
   if (isAuthenticated === null) {
     return (
       <div className="min-h-screen bg-stone-900 flex items-center justify-center p-4">
-        <div className="w-8 h-8 border-3 border-amber-accent border-t-transparent rounded-full animate-spin" />
+        <div className="w-8 h-8 border-3 border-aperitivo-spritz border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-stone-100 flex font-sans">
+    <div className="min-h-screen bg-stone-100 flex flex-col md:flex-row font-sans">
       <AdminSidebar />
-      <main className="flex-1 overflow-y-auto p-6 md:p-8">{children}</main>
+      <main className="flex-1 overflow-y-auto p-4 sm:p-6 md:p-8">{children}</main>
     </div>
   );
 }

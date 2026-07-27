@@ -121,13 +121,13 @@ export function MenuItemModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-stone-900/60 backdrop-blur-xs p-3 sm:p-4 font-sans">
-      <div className="relative w-full max-w-xl max-h-[92vh] bg-white rounded-2xl shadow-2xl flex flex-col overflow-hidden border border-stone-200">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-stone-900/60 backdrop-blur-xs p-0 sm:p-4 font-sans">
+      <div className="relative w-full max-w-xl max-h-[92vh] sm:max-h-[90vh] bg-white rounded-t-3xl sm:rounded-2xl shadow-2xl flex flex-col overflow-hidden border border-stone-200 animate-fadeIn">
         {/* Modal Header */}
-        <div className="px-6 py-4 border-b border-stone-200 flex items-center justify-between bg-stone-50/90 flex-shrink-0">
+        <div className="px-5 sm:px-6 py-4 border-b border-stone-200 flex items-center justify-between bg-stone-50/90 flex-shrink-0">
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-aperitivo-spritz" />
-            <h2 className="text-base font-bold text-stone-900">
+            <h2 className="text-sm sm:text-base font-bold text-stone-900">
               {initialItem ? 'Modifica Piatto' : 'Aggiungi Nuovo Piatto'}
             </h2>
           </div>
@@ -141,9 +141,9 @@ export function MenuItemModal({
         </div>
 
         {/* Form Body - Scrollable */}
-        <form id="menu-item-form" onSubmit={handleSubmit} className="p-6 overflow-y-auto space-y-5 flex-1">
+        <form id="menu-item-form" onSubmit={handleSubmit} className="p-4 sm:p-6 overflow-y-auto space-y-4 sm:space-y-5 flex-1">
           {/* Category & Price */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             <div>
               <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">
                 Categoria *
@@ -185,7 +185,7 @@ export function MenuItemModal({
               <Globe className="w-3.5 h-3.5 text-aperitivo-spritz" />
               <span>Nome Prodotto Trilingue (IT / EN / FR)</span>
             </label>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-3">
               <div>
                 <span className="text-[10px] font-bold uppercase text-stone-400">IT *</span>
                 <input
@@ -225,7 +225,7 @@ export function MenuItemModal({
             <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider">
               Descrizione Trilingue
             </label>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-3">
               <div>
                 <span className="text-[10px] font-bold uppercase text-stone-400">IT</span>
                 <textarea
@@ -264,8 +264,8 @@ export function MenuItemModal({
             <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider">
               Foto Piatto (Upload File o URL)
             </label>
-            <div className="flex items-center gap-3">
-              <label className="flex items-center gap-2 px-3.5 py-2 bg-stone-100 hover:bg-stone-200 border border-stone-300 rounded-xl text-xs font-semibold text-stone-700 cursor-pointer transition-colors">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
+              <label className="flex items-center justify-center gap-2 px-3.5 py-2 bg-stone-100 hover:bg-stone-200 border border-stone-300 rounded-xl text-xs font-semibold text-stone-700 cursor-pointer transition-colors">
                 <Upload className="w-4 h-4 text-aperitivo-spritz" />
                 <span>{uploading ? 'Caricamento...' : 'Carica File Immagine'}</span>
                 <input
@@ -275,7 +275,7 @@ export function MenuItemModal({
                   className="hidden"
                 />
               </label>
-              <span className="text-xs text-stone-400 font-medium">oppure</span>
+              <span className="text-center sm:text-left text-xs text-stone-400 font-medium">oppure</span>
               <input
                 type="url"
                 value={photoUrl}
@@ -313,9 +313,9 @@ export function MenuItemModal({
                 Allergeni EU (14 Obbligatori)
               </label>
               {allergens.length === 0 && (
-                <span className="inline-flex items-center gap-1 text-[11px] font-bold text-rose-700 bg-rose-50 border border-rose-200 px-2 py-0.5 rounded-full">
+                <span className="inline-flex items-center gap-1 text-[10px] font-bold text-rose-700 bg-rose-50 border border-rose-200 px-2 py-0.5 rounded-full">
                   <AlertTriangle className="w-3 h-3" />
-                  Nessun allergene selezionato
+                  Da selezionare
                 </span>
               )}
             </div>
@@ -335,7 +335,7 @@ export function MenuItemModal({
                     }`}
                   >
                     <span
-                      className={`w-5 h-5 rounded-md flex items-center justify-center border text-[9px] font-bold ${
+                      className={`w-5 h-5 rounded-md flex items-center justify-center border text-[9px] font-bold flex-shrink-0 ${
                         isSelected
                           ? 'border-white bg-white/20 text-white'
                           : 'border-stone-300 text-aperitivo-spritz'
@@ -351,7 +351,7 @@ export function MenuItemModal({
           </div>
 
           {/* Toggles */}
-          <div className="flex items-center justify-between pt-2 border-t border-stone-200">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 pt-2 border-t border-stone-200">
             <label className="flex items-center gap-2 cursor-pointer text-xs font-bold text-stone-800 bg-amber-50/80 hover:bg-amber-100/80 border border-amber-200 px-3 py-2 rounded-xl transition-colors">
               <input
                 type="checkbox"
@@ -375,7 +375,7 @@ export function MenuItemModal({
         </form>
 
         {/* Sticky Fixed Modal Footer */}
-        <div className="sticky bottom-0 bg-white border-t border-stone-200 px-6 py-3.5 flex items-center justify-between z-20 flex-shrink-0 shadow-lg">
+        <div className="sticky bottom-0 bg-white border-t border-stone-200 px-5 sm:px-6 py-3.5 flex items-center justify-between z-20 flex-shrink-0 shadow-lg">
           <button
             type="button"
             onClick={onClose}
