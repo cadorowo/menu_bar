@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Phone, MapPin, Clock, Instagram, Facebook, Globe, ChevronDown, ChevronUp } from 'lucide-react';
+import { Phone, MapPin, Clock, Globe, ChevronDown, ChevronUp } from 'lucide-react';
 import { useLocale } from '@/lib/i18n';
 
 export function Footer() {
@@ -45,9 +45,9 @@ export function Footer() {
               )}
             </button>
 
-            {/* Always visible summary preview - Trilingual IT / FR / EN */}
+            {/* Always visible summary preview (Pure White Text) */}
             {!showHours && (
-              <p className="text-[11px] text-stone-400 pl-5 pt-0.5 font-medium">
+              <p className="text-[11px] text-white pl-5 pt-0.5 font-medium">
                 {locale === 'it'
                   ? 'Lun - Gio 06:30–22:30 | Ven - Sab 06:30–01:00 | Dom Chiuso'
                   : locale === 'fr'
@@ -56,40 +56,40 @@ export function Footer() {
               </p>
             )}
 
-            {/* Detailed Hours List */}
+            {/* Detailed Hours List (All Text Pure White) */}
             {showHours && (
-              <div className="mt-2.5 p-3.5 bg-stone-900/90 border border-stone-800 rounded-2xl space-y-1.5 text-[11px] text-stone-300 animate-fadeIn">
+              <div className="mt-2.5 p-3.5 bg-stone-900/90 border border-stone-800 rounded-2xl space-y-1.5 text-[11px] text-white animate-fadeIn">
                 <div className="flex justify-between pb-1 border-b border-stone-800 font-bold text-white">
                   <span>{locale === 'it' ? 'Giorno' : locale === 'fr' ? 'Jour' : 'Day'}</span>
                   <span>{locale === 'it' ? 'Orario' : locale === 'fr' ? 'Heures' : 'Hours'}</span>
                 </div>
-                <div className="flex justify-between">
+                <div className="flex justify-between text-white font-medium">
                   <span>{locale === 'it' ? 'Lunedì' : locale === 'fr' ? 'Lundi' : 'Monday'}</span>
-                  <span className="font-mono text-aperitivo-spritz">06:30 – 22:30</span>
+                  <span className="font-mono text-white font-bold">06:30 – 22:30</span>
                 </div>
-                <div className="flex justify-between">
+                <div className="flex justify-between text-white font-medium">
                   <span>{locale === 'it' ? 'Martedì' : locale === 'fr' ? 'Mardi' : 'Tuesday'}</span>
-                  <span className="font-mono text-aperitivo-spritz">06:30 – 22:30</span>
+                  <span className="font-mono text-white font-bold">06:30 – 22:30</span>
                 </div>
-                <div className="flex justify-between">
+                <div className="flex justify-between text-white font-medium">
                   <span>{locale === 'it' ? 'Mercoledì' : locale === 'fr' ? 'Mercredi' : 'Wednesday'}</span>
-                  <span className="font-mono text-aperitivo-spritz">06:30 – 22:30</span>
+                  <span className="font-mono text-white font-bold">06:30 – 22:30</span>
                 </div>
-                <div className="flex justify-between">
+                <div className="flex justify-between text-white font-medium">
                   <span>{locale === 'it' ? 'Giovedì' : locale === 'fr' ? 'Jeudi' : 'Thursday'}</span>
-                  <span className="font-mono text-aperitivo-spritz">06:30 – 22:30</span>
+                  <span className="font-mono text-white font-bold">06:30 – 22:30</span>
                 </div>
-                <div className="flex justify-between font-semibold text-white">
+                <div className="flex justify-between font-bold text-white">
                   <span>{locale === 'it' ? 'Venerdì' : locale === 'fr' ? 'Vendredi' : 'Friday'}</span>
-                  <span className="font-mono text-amber-400">06:30 – 01:00</span>
+                  <span className="font-mono text-white font-bold">06:30 – 01:00</span>
                 </div>
-                <div className="flex justify-between font-semibold text-white">
+                <div className="flex justify-between font-bold text-white">
                   <span>{locale === 'it' ? 'Sabato' : locale === 'fr' ? 'Samedi' : 'Saturday'}</span>
-                  <span className="font-mono text-amber-400">06:30 – 01:00</span>
+                  <span className="font-mono text-white font-bold">06:30 – 01:00</span>
                 </div>
-                <div className="flex justify-between text-rose-400 font-bold pt-1 border-t border-stone-800">
+                <div className="flex justify-between text-white font-bold pt-1 border-t border-stone-800">
                   <span>{locale === 'it' ? 'Domenica' : locale === 'fr' ? 'Dimanche' : 'Sunday'}</span>
-                  <span>{locale === 'it' ? 'Chiuso' : locale === 'fr' ? 'Fermé' : 'Closed'}</span>
+                  <span className="text-white font-bold">{locale === 'it' ? 'Chiuso' : locale === 'fr' ? 'Fermé' : 'Closed'}</span>
                 </div>
               </div>
             )}
@@ -105,28 +105,6 @@ export function Footer() {
             <Phone className="w-4 h-4" />
             <span>+39 334 190 2702</span>
           </a>
-
-          {/* Social Links */}
-          <div className="flex items-center gap-2.5">
-            <a
-              href="https://instagram.com"
-              target="_blank"
-              rel="noreferrer"
-              className="p-2 bg-stone-800 hover:bg-stone-700 text-stone-300 hover:text-white rounded-xl transition-colors"
-              aria-label="Instagram"
-            >
-              <Instagram className="w-4 h-4" />
-            </a>
-            <a
-              href="https://facebook.com"
-              target="_blank"
-              rel="noreferrer"
-              className="p-2 bg-stone-800 hover:bg-stone-700 text-stone-300 hover:text-white rounded-xl transition-colors"
-              aria-label="Facebook"
-            >
-              <Facebook className="w-4 h-4" />
-            </a>
-          </div>
         </div>
 
         {/* Fallback Language Toggle (IT | EN | FR) */}
