@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Header } from '@/components/public/Header';
 import { CategoryNav } from '@/components/public/CategoryNav';
 import { DishRow } from '@/components/public/DishRow';
@@ -20,9 +20,6 @@ export default function PublicMenuPage() {
   const [isLegendOpen, setIsLegendOpen] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
 
-  const isManualScrolling = useRef<boolean>(false);
-  const scrollTimeout = useRef<NodeJS.Timeout | null>(null);
-
   useEffect(() => {
     const loadedCategories = Store.getCategories()
       .filter((c) => c.active)
@@ -37,22 +34,8 @@ export default function PublicMenuPage() {
   }, []);
 
   const handleSelectCategory = (id: string) => {
-    isManualScrolling.current = true;
     setActiveCategoryId(id);
-
-    if (id !== 'all') {
-      const el = document.getElementById(`category-${id}`);
-      if (el) {
-        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
-    } else {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    if (scrollTimeout.current) clearTimeout(scrollTimeout.current);
-    scrollTimeout.current = setTimeout(() => {
-      isManualScrolling.current = false;
-    }, 800);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   // Filter items by search query if typed
