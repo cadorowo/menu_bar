@@ -45,10 +45,14 @@ export function Footer() {
               )}
             </button>
 
-            {/* Always visible summary */}
+            {/* Always visible summary preview - Trilingual IT / FR / EN */}
             {!showHours && (
-              <p className="text-[11px] text-stone-400 pl-5 pt-0.5">
-                Lun - Gio 06:30–22:30 | Ven - Sab 06:30–01:00 | Dom Chiuso
+              <p className="text-[11px] text-stone-400 pl-5 pt-0.5 font-medium">
+                {locale === 'it'
+                  ? 'Lun - Gio 06:30–22:30 | Ven - Sab 06:30–01:00 | Dom Chiuso'
+                  : locale === 'fr'
+                  ? 'Lun - Jeu 06:30–22:30 | Ven - Sam 06:30–01:00 | Dim Fermé'
+                  : 'Mon - Thu 06:30–22:30 | Fri - Sat 06:30–01:00 | Sun Closed'}
               </p>
             )}
 
