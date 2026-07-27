@@ -135,6 +135,7 @@ Admin Dashboard (/admin)
 | `public/allergens/LU.jpeg` | Lupin icon |
 | `public/allergens/MO.jpeg` | Molluscs icon |
 | `supabase_schema.sql` | Full PostgreSQL schema with RLS — run once in Supabase SQL Editor |
+| `.github/workflows/keep-supabase-alive.yml` | Cron GitHub Action (every 3 days at 12:00 UTC) to prevent free-tier DB auto-pause |
 
 ---
 
@@ -160,10 +161,14 @@ When deploying or setting up a fresh environment:
 - [ ] Confirm Supabase returns data: `categories` (5 rows), `menu_items` (9 rows)
 - [ ] Add env vars to Vercel dashboard for production deployments
 - [ ] Run `npm run build` to validate TypeScript — should show 0 errors
+- [ ] Verify GitHub Action `.github/workflows/keep-supabase-alive.yml` is enabled
 
 ---
 
 ## Known Behaviors & Workarounds
+
+### Supabase Keep-Alive Workflow
+Supabase Free Tier automatically pauses projects after 7 days of inactivity. The workflow `.github/workflows/keep-supabase-alive.yml` runs every 3 days at 12:00 UTC, sending a light `curl` GET request to `/rest/v1/categories?select=id&limit=1`. This resets the inactivity counter so the project stays active 24/7 without needing paid upgrades or manual log-ins.
 
 ### Category Filter Centering
 `CategoryNav.tsx` uses `getBoundingClientRect()` math in the `onClick` handler to scroll the active pill to center. This is intentional and more reliable than CSS `scroll-behavior: smooth`. Do not replace it with `scrollIntoView`.
