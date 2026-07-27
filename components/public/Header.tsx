@@ -12,9 +12,9 @@ export function Header({ onOpenAllergenModal }: HeaderProps) {
   const { locale } = useLocale();
 
   return (
-    <header className="relative bg-[#FAF7F2] border-b border-aperitivo-border/80 px-4 sm:px-5 py-4 transition-all shadow-paper">
+    <header className="sticky top-0 z-40 bg-[#FAF7F2]/95 backdrop-blur-md border-b border-aperitivo-border/80 px-4 sm:px-5 py-3.5 shadow-paper">
       <div className="max-w-md mx-auto flex items-center justify-between">
-        {/* Restaurant Brand without icon */}
+        {/* Restaurant Brand */}
         <div>
           <h1 className="font-serif text-xl font-extrabold tracking-tight text-aperitivo-slate leading-none">
             Menu Bar Franca

@@ -39,7 +39,7 @@ export function CategoryNav({
 
     const element = document.getElementById(`category-${id}`);
     if (element) {
-      const offset = 60;
+      const offset = 125;
       const bodyRect = document.body.getBoundingClientRect().top;
       const elementRect = element.getBoundingClientRect().top;
       const elementPosition = elementRect - bodyRect;
@@ -53,16 +53,16 @@ export function CategoryNav({
   };
 
   return (
-    <nav className="relative bg-[#FAF7F2] border-b border-aperitivo-border/50 py-1.5">
+    <nav className="sticky top-[58px] z-30 bg-[#FAF7F2]/95 backdrop-blur-md border-b border-aperitivo-border/50 py-2 shadow-2xs">
       <div
         ref={navRef}
-        className="max-w-md mx-auto flex items-center gap-1.5 overflow-x-auto no-scrollbar px-3 snap-x-container"
+        className="max-w-md mx-auto flex items-center gap-2 overflow-x-auto no-scrollbar px-3.5 snap-x-container"
       >
-        {/* 'All' Tab Option (Compact & Short) */}
+        {/* 'All' Tab Option */}
         <button
           ref={activeCategoryId === 'all' ? activeTabRef : null}
           onClick={() => handleTabClick('all')}
-          className={`snap-tab flex-shrink-0 px-3 py-1 rounded-full text-xs font-bold tracking-tight whitespace-nowrap transition-all duration-200 cursor-pointer ${
+          className={`snap-tab flex-shrink-0 px-4 py-1.5 rounded-full text-xs font-bold tracking-tight whitespace-nowrap transition-colors cursor-pointer ${
             activeCategoryId === 'all'
               ? 'bg-gradient-to-r from-aperitivo-spritz to-aperitivo-vermilion text-white shadow-xs'
               : 'bg-white/90 text-stone-600 hover:text-stone-900 border border-stone-200/80 shadow-2xs'
@@ -79,7 +79,7 @@ export function CategoryNav({
               key={cat.id}
               ref={isActive ? activeTabRef : null}
               onClick={() => handleTabClick(cat.id)}
-              className={`snap-tab flex-shrink-0 px-3 py-1 rounded-full text-xs font-bold tracking-tight whitespace-nowrap transition-all duration-200 cursor-pointer ${
+              className={`snap-tab flex-shrink-0 px-4 py-1.5 rounded-full text-xs font-bold tracking-tight whitespace-nowrap transition-colors cursor-pointer ${
                 isActive
                   ? 'bg-gradient-to-r from-aperitivo-spritz to-aperitivo-vermilion text-white shadow-xs'
                   : 'bg-white/90 text-stone-600 hover:text-stone-900 border border-stone-200/80 shadow-2xs'
