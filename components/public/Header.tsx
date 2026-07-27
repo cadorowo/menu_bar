@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Info, Sparkles } from 'lucide-react';
+import { Info, MapPin } from 'lucide-react';
 import { useLocale } from '@/lib/i18n';
 
 interface HeaderProps {
@@ -20,7 +20,7 @@ export function Header({ onOpenAllergenModal }: HeaderProps) {
             Menu Bar Franca
           </h1>
           <p className="text-[10px] font-semibold text-aperitivo-spritz tracking-widest uppercase flex items-center gap-1 mt-1">
-            <Sparkles className="w-2.5 h-2.5" />
+            <MapPin className="w-2.5 h-2.5 flex-shrink-0" />
             <span>Via Croix-de-Ville, 70 • Aosta</span>
           </p>
         </div>
