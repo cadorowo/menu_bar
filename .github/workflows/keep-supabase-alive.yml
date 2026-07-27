@@ -1,0 +1,36 @@
+name: Keep Supabase Alive
+
+on:
+  schedule:
+    # Runs every 3 days at 12:00 UTC to prevent Supabase Free Tier 7-day inactivity pause
+    - cron: '0 12 */3 * *'
+  workflow_dispatch: # Allows manual triggering from the GitHub Actions UI
+
+jobs:
+  ping-supabase:
+    name: Ping Supabase REST API
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Database
+        env:
+          SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+        run: |
+          # Use secrets if available, otherwise fallback to project defaults
+          URL="${SUPABASE_URL:-https://mertfuqvcqidwbqdjzle.supabase.co}"
+          KEY="${SUPABASE_ANON_KEY:-sb_publishable_LgX9Z8rA-HoRhvXDiLGCxQ_XS5RFPAX}"
+
+          echo "Pinging Supabase REST API endpoint..."
+          RESPONSE_CODE=$(curl -s -o /dev/null -w "%{http_code}" \
+            -H "apikey: $KEY" \
+            -H "Authorization: Bearer $KEY" \
+            "$URL/rest/v1/categories?select=id&limit=1")
+
+          echo "Supabase HTTP Status Code: $RESPONSE_CODE"
+
+          if [ "$RESPONSE_CODE" -ge 200 ] && [ "$RESPONSE_CODE" -lt 300 ]; then
+            echo "✅ Supabase project is active and healthy!"
+          else
+            echo "❌ Failed to reach Supabase API (HTTP $RESPONSE_CODE)"
+            exit 1
+          fi

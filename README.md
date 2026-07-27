@@ -104,6 +104,16 @@ Open [http://localhost:3000/admin](http://localhost:3000/admin) for the admin da
 
 ---
 
+### 6. Supabase Keep-Alive (Prevent Free Tier 7-Day Auto-Pause)
+
+Supabase Free Tier automatically pauses projects after 7 days of inactivity. This repository includes an automated GitHub Action workflow ([`.github/workflows/keep-supabase-alive.yml`](./.github/workflows/keep-supabase-alive.yml)) that pings the Supabase API **every 3 days**.
+
+To enable custom secrets in GitHub Actions (optional):
+1. Go to your repository on GitHub: **Settings → Secrets and variables → Actions**
+2. Add `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` as Repository Secrets.
+
+---
+
 ## Admin Dashboard Access
 
 The admin dashboard is protected by a **4-digit PIN passcode**.
