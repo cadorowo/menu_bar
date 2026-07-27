@@ -19,28 +19,35 @@ export function CategoryNav({
   const navRef = useRef<HTMLDivElement>(null);
   const activeTabRef = useRef<HTMLButtonElement>(null);
 
-  // Bulletproof horizontal tab centering using viewport rects
+  const centerTabElement = (tab: HTMLElement) => {
+    const nav = navRef.current;
+    if (!nav || !tab) return;
+    const navRect = nav.getBoundingClientRect();
+    const tabRect = tab.getBoundingClientRect();
+
+    const tabCenter = tabRect.left + tabRect.width / 2;
+    const navCenter = navRect.left + navRect.width / 2;
+    const diff = tabCenter - navCenter;
+
+    nav.scrollTo({
+      left: nav.scrollLeft + diff,
+      behavior: 'smooth',
+    });
+  };
+
+  // Center active tab pill whenever activeCategoryId updates
   useEffect(() => {
-    if (activeTabRef.current && navRef.current) {
-      const nav = navRef.current;
-      const tab = activeTabRef.current;
-
-      const navRect = nav.getBoundingClientRect();
-      const tabRect = tab.getBoundingClientRect();
-
-      const tabCenter = tabRect.left + tabRect.width / 2;
-      const navCenter = navRect.left + navRect.width / 2;
-      const diff = tabCenter - navCenter;
-
-      nav.scrollTo({
-        left: nav.scrollLeft + diff,
-        behavior: 'smooth',
-      });
-    }
+    const timer = setTimeout(() => {
+      if (activeTabRef.current) {
+        centerTabElement(activeTabRef.current);
+      }
+    }, 30);
+    return () => clearTimeout(timer);
   }, [activeCategoryId]);
 
-  const handleTabClick = (id: string) => {
+  const handleTabClick = (id: string, e: React.MouseEvent<HTMLButtonElement>) => {
     onSelectCategory(id);
+    centerTabElement(e.currentTarget);
   };
 
   return (
@@ -52,7 +59,7 @@ export function CategoryNav({
         {/* 'All' Tab Option */}
         <button
           ref={activeCategoryId === 'all' ? activeTabRef : null}
-          onClick={() => handleTabClick('all')}
+          onClick={(e) => handleTabClick('all', e)}
           className={`snap-tab flex-shrink-0 px-4 py-1.5 rounded-full text-xs font-bold tracking-tight whitespace-nowrap transition-colors cursor-pointer ${
             activeCategoryId === 'all'
               ? 'bg-gradient-to-r from-aperitivo-spritz to-aperitivo-vermilion text-white shadow-xs'
@@ -69,7 +76,7 @@ export function CategoryNav({
             <button
               key={cat.id}
               ref={isActive ? activeTabRef : null}
-              onClick={() => handleTabClick(cat.id)}
+              onClick={(e) => handleTabClick(cat.id, e)}
               className={`snap-tab flex-shrink-0 px-4 py-1.5 rounded-full text-xs font-bold tracking-tight whitespace-nowrap transition-colors cursor-pointer ${
                 isActive
                   ? 'bg-gradient-to-r from-aperitivo-spritz to-aperitivo-vermilion text-white shadow-xs'
