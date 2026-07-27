@@ -19,18 +19,21 @@ export function CategoryNav({
   const navRef = useRef<HTMLDivElement>(null);
   const activeTabRef = useRef<HTMLButtonElement>(null);
 
-  // Pure horizontal container auto-scroll (NO vertical window jump/shift)
+  // Bulletproof horizontal tab centering using viewport rects
   useEffect(() => {
     if (activeTabRef.current && navRef.current) {
       const nav = navRef.current;
       const tab = activeTabRef.current;
-      const navWidth = nav.clientWidth;
-      const tabLeft = tab.offsetLeft;
-      const tabWidth = tab.clientWidth;
 
-      const targetLeft = tabLeft - navWidth / 2 + tabWidth / 2;
+      const navRect = nav.getBoundingClientRect();
+      const tabRect = tab.getBoundingClientRect();
+
+      const tabCenter = tabRect.left + tabRect.width / 2;
+      const navCenter = navRect.left + navRect.width / 2;
+      const diff = tabCenter - navCenter;
+
       nav.scrollTo({
-        left: Math.max(0, targetLeft),
+        left: nav.scrollLeft + diff,
         behavior: 'smooth',
       });
     }
