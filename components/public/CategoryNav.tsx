@@ -54,7 +54,7 @@ export function CategoryNav({
     <nav className="relative w-full bg-[#FAF7F2] py-2.5">
       <div
         ref={navRef}
-        className="max-w-md mx-auto flex items-center gap-2 overflow-x-auto no-scrollbar px-3.5 snap-x-container"
+        className="max-w-md mx-auto flex items-center gap-2 overflow-x-auto no-scrollbar px-6 snap-x-container"
       >
         {/* 'All' Tab Option */}
         <button
