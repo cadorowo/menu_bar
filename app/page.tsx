@@ -74,13 +74,20 @@ export default function PublicMenuPage() {
 
   return (
     <div className="min-h-screen bg-aperitivo-linen text-aperitivo-slate flex flex-col font-sans bg-paper-pattern">
-      {/* Header */}
+      {/* Main Header */}
       <Header onOpenAllergenModal={() => setIsLegendOpen(true)} />
 
-      {/* Search & Filter Bar */}
-      <div className="bg-[#FAF7F2]/90 backdrop-blur-md border-b border-aperitivo-border/60 px-4 pt-3 pb-1.5 max-w-md mx-auto w-full">
+      {/* Category Tab Navigation */}
+      <CategoryNav
+        categories={categories}
+        activeCategoryId={isSearching ? 'all' : activeCategoryId}
+        onSelectCategory={handleSelectCategory}
+      />
+
+      {/* Search Input Bar (Spacious & Clean) */}
+      <div className="max-w-md mx-auto w-full px-4 pt-4 pb-1">
         <div className="relative">
-          <Search className="w-4 h-4 text-aperitivo-muted absolute left-3.5 top-1/2 -translate-y-1/2" />
+          <Search className="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
           <input
             type="text"
             value={searchQuery}
@@ -92,12 +99,12 @@ export default function PublicMenuPage() {
                 ? 'Chercher un plat, une boisson...'
                 : 'Search dish, drink or ingredient...'
             }
-            className="w-full pl-9 pr-9 py-2.5 text-xs rounded-xl bg-white border border-aperitivo-border focus:ring-2 focus:ring-aperitivo-spritz/50 focus:border-aperitivo-spritz outline-none shadow-2xs font-medium placeholder-aperitivo-muted/70"
+            className="w-full pl-9 pr-9 py-2.5 text-xs rounded-2xl bg-white border border-stone-200 focus:ring-2 focus:ring-aperitivo-spritz/40 focus:border-aperitivo-spritz outline-none shadow-2xs font-medium placeholder-stone-400"
           />
           {searchQuery && (
             <button
               onClick={() => setSearchQuery('')}
-              className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 text-stone-400 hover:text-stone-700"
+              className="absolute right-3.5 top-1/2 -translate-y-1/2 p-0.5 text-stone-400 hover:text-stone-700"
             >
               <X className="w-3.5 h-3.5" />
             </button>
@@ -105,15 +112,8 @@ export default function PublicMenuPage() {
         </div>
       </div>
 
-      {/* Category Tab Navigation */}
-      <CategoryNav
-        categories={categories}
-        activeCategoryId={isSearching ? 'all' : activeCategoryId}
-        onSelectCategory={handleSelectCategory}
-      />
-
       {/* Main Dishes Container */}
-      <main className="flex-1 max-w-md w-full mx-auto px-0 py-4 space-y-7">
+      <main className="flex-1 max-w-md w-full mx-auto px-0 py-3 space-y-7">
         {categories.map((category) => {
           if (!isSearching && activeCategoryId !== 'all' && activeCategoryId !== category.id) {
             return null;
@@ -146,7 +146,7 @@ export default function PublicMenuPage() {
             <section
               key={category.id}
               id={`category-${category.id}`}
-              className="pt-4 pb-2 scroll-mt-32"
+              className="pt-3 pb-1 scroll-mt-36"
             >
               {/* Category Title Header */}
               <div className="px-5 pb-3 flex items-center justify-between border-b border-aperitivo-border/80 mx-4 mb-3">
