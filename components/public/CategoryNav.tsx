@@ -41,7 +41,7 @@ export function CategoryNav({
   };
 
   return (
-    <nav className="sticky top-[58px] z-30 bg-[#FAF7F2]/95 backdrop-blur-md border-b border-aperitivo-border/50 py-2 shadow-2xs">
+    <nav className="relative w-full bg-[#FAF7F2] py-2.5">
       <div
         ref={navRef}
         className="max-w-md mx-auto flex items-center gap-2 overflow-x-auto no-scrollbar px-3.5 snap-x-container"

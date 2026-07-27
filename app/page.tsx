@@ -60,15 +60,15 @@ export default function PublicMenuPage() {
 
   return (
     <div className="min-h-screen bg-aperitivo-linen text-aperitivo-slate flex flex-col font-sans bg-paper-pattern">
-      {/* Main Header */}
-      <Header onOpenAllergenModal={() => setIsLegendOpen(true)} />
-
-      {/* Category Tab Navigation */}
-      <CategoryNav
-        categories={categories}
-        activeCategoryId={isSearching ? 'all' : activeCategoryId}
-        onSelectCategory={handleSelectCategory}
-      />
+      {/* Unified Sticky Header & Category Filter Container */}
+      <div className="sticky top-0 z-40 bg-[#FAF7F2]/95 backdrop-blur-md border-b border-aperitivo-border/80 shadow-2xs">
+        <Header onOpenAllergenModal={() => setIsLegendOpen(true)} />
+        <CategoryNav
+          categories={categories}
+          activeCategoryId={isSearching ? 'all' : activeCategoryId}
+          onSelectCategory={handleSelectCategory}
+        />
+      </div>
 
       {/* Search Input Bar (Spacious & Clean) */}
       <div className="max-w-md mx-auto w-full px-4 pt-4 pb-1">
