@@ -38,24 +38,8 @@ export function CategoryNav({
 
   const handleTabClick = (id: string) => {
     onSelectCategory(id);
-    if (id === 'all') {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-      return;
-    }
-
-    const element = document.getElementById(`category-${id}`);
-    if (element) {
-      const offset = 125;
-      const bodyRect = document.body.getBoundingClientRect().top;
-      const elementRect = element.getBoundingClientRect().top;
-      const elementPosition = elementRect - bodyRect;
-      const offsetPosition = elementPosition - offset;
-
-      window.scrollTo({
-        top: offsetPosition,
-        behavior: 'smooth',
-      });
-    }
+    // Bring user smoothly to top of the menu when selecting any category tab
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (
