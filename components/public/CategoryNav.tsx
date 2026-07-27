@@ -39,7 +39,7 @@ export function CategoryNav({
 
     const element = document.getElementById(`category-${id}`);
     if (element) {
-      const offset = 120;
+      const offset = 60;
       const bodyRect = document.body.getBoundingClientRect().top;
       const elementRect = element.getBoundingClientRect().top;
       const elementPosition = elementRect - bodyRect;
@@ -53,7 +53,7 @@ export function CategoryNav({
   };
 
   return (
-    <nav className="sticky top-[61px] z-30 bg-[#FAF7F2]/95 backdrop-blur-md border-b border-aperitivo-border/50 py-1.5">
+    <nav className="relative bg-[#FAF7F2] border-b border-aperitivo-border/50 py-1.5">
       <div
         ref={navRef}
         className="max-w-md mx-auto flex items-center gap-1.5 overflow-x-auto no-scrollbar px-3 snap-x-container"
