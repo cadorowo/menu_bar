@@ -62,7 +62,7 @@ export default function MenuItemsManagementPage() {
       });
     } else {
       const newItem: MenuItem = {
-        id: 'item-' + Date.now(),
+        id: crypto.randomUUID(),
         category_id: itemData.category_id || categories[0]?.id || 'cat-1',
         name: itemData.name || { it: 'Nuovo Piatto' },
         description: itemData.description,

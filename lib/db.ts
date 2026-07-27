@@ -3,31 +3,31 @@ import { supabase, isSupabaseConfigured } from './supabase';
 
 export const INITIAL_CATEGORIES: Category[] = [
   {
-    id: 'cat-1',
+    id: 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11',
     name: { it: 'Caffetteria & Colazione', en: 'Coffee & Breakfast', fr: 'Cafétéria & Petit-déjeuner' },
     sort_order: 1,
     active: true,
   },
   {
-    id: 'cat-2',
+    id: 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a22',
     name: { it: 'Aperitivi & Cocktails', en: 'Aperitifs & Cocktails', fr: 'Apéritifs & Cocktails' },
     sort_order: 2,
     active: true,
   },
   {
-    id: 'cat-3',
+    id: 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a33',
     name: { it: 'Vini della Valle d’Aosta', en: 'Aosta Valley Wines', fr: 'Vins de la Vallée d’Aoste' },
     sort_order: 3,
     active: true,
   },
   {
-    id: 'cat-4',
+    id: 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a44',
     name: { it: 'Taglieri & Panini Valdostani', en: 'Valdostan Boards & Sandwiches', fr: 'Planches & Sandwichs Valdôtains' },
     sort_order: 4,
     active: true,
   },
   {
-    id: 'cat-5',
+    id: 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a55',
     name: { it: 'Dolci della Casa', en: 'Homemade Desserts', fr: 'Desserts Maison' },
     sort_order: 5,
     active: true,
@@ -36,8 +36,8 @@ export const INITIAL_CATEGORIES: Category[] = [
 
 export const INITIAL_MENU_ITEMS: MenuItem[] = [
   {
-    id: 'item-1',
-    category_id: 'cat-2',
+    id: 'b0eebc99-9c0b-4ef8-bb6d-6bb9bd380b11',
+    category_id: 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a22',
     name: { it: 'Genepì Spritz Valdostano', en: 'Valdostan Genepì Spritz', fr: 'Spritz au Génépy Valdôtain' },
     description: {
       it: 'Liquore tipico al Genepì delle Alpi, Prosecco DOC, seltz e scorza di limone.',
@@ -52,8 +52,8 @@ export const INITIAL_MENU_ITEMS: MenuItem[] = [
     active: true,
   },
   {
-    id: 'item-2',
-    category_id: 'cat-2',
+    id: 'b0eebc99-9c0b-4ef8-bb6d-6bb9bd380b22',
+    category_id: 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a22',
     name: { it: 'Aperol Spritz Classico', en: 'Classic Aperol Spritz', fr: 'Aperol Spritz Classique' },
     description: {
       it: 'Prosecco DOC, Aperol, seltz, fetta d’arancia fresca e oliva verde.',
@@ -68,8 +68,8 @@ export const INITIAL_MENU_ITEMS: MenuItem[] = [
     active: true,
   },
   {
-    id: 'item-3',
-    category_id: 'cat-3',
+    id: 'b0eebc99-9c0b-4ef8-bb6d-6bb9bd380b33',
+    category_id: 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a33',
     name: { it: 'Torrette Valle d’Aosta DOC (Calice)', en: 'Torrette Aosta Valley DOC (Glass)', fr: 'Torrette Vallée d’Aoste DOC (Verre)' },
     description: {
       it: 'Vino rosso autoctono valdostano, corpo armonico con note di mandorla e piccoli frutti rossi.',
@@ -84,8 +84,8 @@ export const INITIAL_MENU_ITEMS: MenuItem[] = [
     active: true,
   },
   {
-    id: 'item-4',
-    category_id: 'cat-3',
+    id: 'b0eebc99-9c0b-4ef8-bb6d-6bb9bd380b44',
+    category_id: 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a33',
     name: { it: 'Blanc de Morgex et de La Salle DOC', en: 'Blanc de Morgex et de La Salle DOC', fr: 'Blanc de Morgex et de La Salle DOC' },
     description: {
       it: 'Vino bianco da vitigni ad alta quota, fresco, minerale e profumato.',
@@ -100,8 +100,8 @@ export const INITIAL_MENU_ITEMS: MenuItem[] = [
     active: true,
   },
   {
-    id: 'item-5',
-    category_id: 'cat-4',
+    id: 'b0eebc99-9c0b-4ef8-bb6d-6bb9bd380b55',
+    category_id: 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a44',
     name: { it: 'Tagliere Valdostano con Fontina DOP & Mocetta', en: 'Valdostan Board with Fontina DOP & Mocetta', fr: 'Planche Valdôtaine avec Fontina AOP & Mocetta' },
     description: {
       it: 'Fontina d’alpeggio DOP, Mocetta di bovino, Lardo d’Arnad DOP e pane nero di segale.',
@@ -116,8 +116,8 @@ export const INITIAL_MENU_ITEMS: MenuItem[] = [
     active: true,
   },
   {
-    id: 'item-6',
-    category_id: 'cat-4',
+    id: 'b0eebc99-9c0b-4ef8-bb6d-6bb9bd380b66',
+    category_id: 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a44',
     name: { it: 'Crostone al Lardo d’Arnad DOP & Miele di Castagno', en: 'Arnad Lard & Chestnut Honey Toast', fr: 'Tartine au Lard d’Arnad AOP & Miel de Châtaignier' },
     description: {
       it: 'Pane di segale caldo tostato con Lardo d’Arnad DOP fondente e miele biologico di castagno.',
@@ -132,8 +132,8 @@ export const INITIAL_MENU_ITEMS: MenuItem[] = [
     active: true,
   },
   {
-    id: 'item-7',
-    category_id: 'cat-4',
+    id: 'b0eebc99-9c0b-4ef8-bb6d-6bb9bd380b77',
+    category_id: 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a44',
     name: { it: 'Panino con Jambon de Bosses DOP & Fontina', en: 'Jambon de Bosses DOP & Fontina Sandwich', fr: 'Sandwich au Jambon de Bosses AOP & Fontina' },
     description: {
       it: 'Prosciutto crudo stagionato Jambon de Bosses DOP delle Alpi e Fontina fusa.',
@@ -148,8 +148,8 @@ export const INITIAL_MENU_ITEMS: MenuItem[] = [
     active: true,
   },
   {
-    id: 'item-8',
-    category_id: 'cat-1',
+    id: 'b0eebc99-9c0b-4ef8-bb6d-6bb9bd380b88',
+    category_id: 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11',
     name: { it: 'Caffè Espresso Valdostano', en: 'Valdostan Espresso Coffee', fr: 'Café Espresso Valdôtain' },
     description: {
       it: 'Miscela arabica intensa servita bollente.',
@@ -164,8 +164,8 @@ export const INITIAL_MENU_ITEMS: MenuItem[] = [
     active: true,
   },
   {
-    id: 'item-9',
-    category_id: 'cat-5',
+    id: 'b0eebc99-9c0b-4ef8-bb6d-6bb9bd380b99',
+    category_id: 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a55',
     name: { it: 'Tegole Valdostane Artigianali con Gelato', en: 'Artisanal Valdostan Tegole with Ice Cream', fr: 'Tegole Valdôtaines Artisanales avec Glace' },
     description: {
       it: 'Biscotti tradizionali alle nocciole serviti con gelato alla vaniglia.',
@@ -187,16 +187,16 @@ export const INITIAL_CHANGELOGS: ChangeLog[] = [
     admin_user_email: 'barfranca@aosta.it',
     action: 'CREATE',
     entity_type: 'MenuItem',
-    entity_id: 'item-1',
+    entity_id: 'b0eebc99-9c0b-4ef8-bb6d-6bb9bd380b11',
     created_at: new Date(Date.now() - 3600000 * 2).toISOString(),
     diff: { name: 'Genepì Spritz Valdostano', price: 7.00 },
   },
 ];
 
 const STORAGE_KEYS = {
-  CATEGORIES: 'bar_franca_categories_v3',
-  ITEMS: 'bar_franca_items_v3',
-  CHANGELOGS: 'bar_franca_changelogs_v3',
+  CATEGORIES: 'bar_franca_categories_v4',
+  ITEMS: 'bar_franca_items_v4',
+  CHANGELOGS: 'bar_franca_changelogs_v4',
 };
 
 export class Store {
@@ -226,8 +226,8 @@ export class Store {
       const mapped: Category[] = data.map((item) => ({
         id: String(item.id),
         name: typeof item.name === 'string' ? JSON.parse(item.name) : item.name,
-        sort_order: item.sort_order || 1,
-        active: item.active !== undefined ? item.active : true,
+        sort_order: Number(item.sort_order) || 1,
+        active: item.active !== undefined ? Boolean(item.active) : true,
       }));
       if (typeof window !== 'undefined') {
         localStorage.setItem(STORAGE_KEYS.CATEGORIES, JSON.stringify(mapped));
@@ -292,8 +292,8 @@ export class Store {
         photo_url: item.photo_url || null,
         allergens: Array.isArray(item.allergens) ? item.allergens : [],
         sold_out: Boolean(item.sold_out),
-        sort_order: item.sort_order || 1,
-        active: item.active !== undefined ? item.active : true,
+        sort_order: Number(item.sort_order) || 1,
+        active: item.active !== undefined ? Boolean(item.active) : true,
       }));
       if (typeof window !== 'undefined') {
         localStorage.setItem(STORAGE_KEYS.ITEMS, JSON.stringify(mapped));
@@ -350,25 +350,12 @@ export class Store {
     const logs = this.getChangeLogs();
     const newLog: ChangeLog = {
       ...log,
-      id: 'log-' + Date.now(),
+      id: crypto.randomUUID ? crypto.randomUUID() : 'log-' + Date.now(),
       created_at: new Date().toISOString(),
     };
     const updated = [newLog, ...logs];
     if (typeof window !== 'undefined') {
       localStorage.setItem(STORAGE_KEYS.CHANGELOGS, JSON.stringify(updated));
-    }
-    const client = supabase;
-    if (client && isSupabaseConfigured) {
-      client.from('change_logs').insert([
-        {
-          id: newLog.id,
-          admin_user_email: newLog.admin_user_email,
-          action: newLog.action,
-          entity_type: newLog.entity_type,
-          entity_id: newLog.entity_id,
-          diff: newLog.diff,
-        },
-      ]).then(() => {}, () => {});
     }
     return newLog;
   }

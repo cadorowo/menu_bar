@@ -78,7 +78,7 @@ export default function CategoryManagementPage() {
       });
     } else {
       const newCat: Category = {
-        id: 'cat-' + Date.now(),
+        id: crypto.randomUUID(),
         name: {
           it: nameIt.trim(),
           en: nameEn.trim() || nameIt.trim(),
