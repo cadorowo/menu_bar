@@ -1,8 +1,7 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
-  FolderTree,
   Plus,
   ArrowUp,
   ArrowDown,
@@ -11,30 +10,66 @@ import {
   X,
   AlertTriangle,
   Save,
+  RefreshCw,
+  Loader2,
+  Check,
+  WifiOff,
 } from 'lucide-react';
 import { Category, MenuItem } from '@/lib/types';
 import { Store } from '@/lib/db';
 
+// ─── Inline toast notification ────────────────────────────────────────────────
+function Toast({ message, type, onClose }: { message: string; type: 'success' | 'error'; onClose: () => void }) {
+  useEffect(() => {
+    const t = setTimeout(onClose, 4000);
+    return () => clearTimeout(t);
+  }, [onClose]);
+  return (
+    <div
+      className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-[200] flex items-center gap-2 px-4 py-2.5 rounded-2xl shadow-xl text-xs font-bold text-white transition-all ${
+        type === 'success' ? 'bg-emerald-600' : 'bg-rose-600'
+      }`}
+    >
+      {type === 'success' ? <Check className="w-4 h-4 stroke-[3]" /> : <WifiOff className="w-4 h-4" />}
+      <span>{message}</span>
+    </div>
+  );
+}
+
 export default function CategoryManagementPage() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [items, setItems] = useState<MenuItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [syncing, setSyncing] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
   const [nameIt, setNameIt] = useState('');
   const [nameEn, setNameEn] = useState('');
   const [nameFr, setNameFr] = useState('');
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+  const [modalSaving, setModalSaving] = useState(false);
+
+  const showToast = (message: string, type: 'success' | 'error') => {
+    setToast({ message, type });
+  };
+
+  // ── Load: always pull fresh data from Supabase ──────────────────────────
+  const loadData = useCallback(async () => {
+    setLoading(true);
+    const [cats, its] = await Promise.all([
+      Store.fetchCategoriesFromSupabase(true), // adminMode = true → ALL including inactive
+      Store.fetchMenuItemsFromSupabase(true),
+    ]);
+    setCategories(cats.sort((a, b) => a.sort_order - b.sort_order));
+    setItems(its);
+    setLoading(false);
+  }, []);
 
   useEffect(() => {
     loadData();
-  }, []);
-
-  const loadData = () => {
-    const cats = Store.getCategories().sort((a, b) => a.sort_order - b.sort_order);
-    setCategories(cats);
-    setItems(Store.getMenuItems());
-  };
+  }, [loadData]);
 
   const handleOpenAdd = () => {
     setEditingCategory(null);
@@ -52,32 +87,24 @@ export default function CategoryManagementPage() {
     setIsModalOpen(true);
   };
 
-  const handleSave = (e: React.FormEvent) => {
+  // ── Save (add or edit) ─────────────────────────────────────────────────
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!nameIt.trim()) return;
 
-    let updated: Category[];
+    let targetCategory: Category;
+
     if (editingCategory) {
-      updated = categories.map((c) =>
-        c.id === editingCategory.id
-          ? {
-              ...c,
-              name: {
-                it: nameIt.trim(),
-                en: nameEn.trim() || nameIt.trim(),
-                fr: nameFr.trim() || nameIt.trim(),
-              },
-            }
-          : c
-      );
-      Store.addChangeLog({
-        admin_user_email: 'staff@barfranca.it',
-        action: 'UPDATE',
-        entity_type: 'Category',
-        entity_id: editingCategory.id,
-      });
+      targetCategory = {
+        ...editingCategory,
+        name: {
+          it: nameIt.trim(),
+          en: nameEn.trim() || nameIt.trim(),
+          fr: nameFr.trim() || nameIt.trim(),
+        },
+      };
     } else {
-      const newCat: Category = {
+      targetCategory = {
         id: crypto.randomUUID(),
         name: {
           it: nameIt.trim(),
@@ -87,21 +114,34 @@ export default function CategoryManagementPage() {
         sort_order: categories.length + 1,
         active: true,
       };
-      updated = [...categories, newCat];
-      Store.addChangeLog({
-        admin_user_email: 'staff@barfranca.it',
-        action: 'CREATE',
-        entity_type: 'Category',
-        entity_id: newCat.id,
-      });
     }
 
-    Store.saveCategories(updated);
-    setCategories(updated);
+    // Optimistic UI update
+    const updatedCategories = editingCategory
+      ? categories.map((c) => (c.id === editingCategory.id ? targetCategory : c))
+      : [...categories, targetCategory];
+    setCategories(updatedCategories);
+
+    setModalSaving(true);
+    const err = await Store.upsertCategory(targetCategory);
+    setModalSaving(false);
     setIsModalOpen(false);
+
+    if (err) {
+      showToast(`Errore Supabase: ${err}`, 'error');
+    } else {
+      showToast(editingCategory ? 'Categoria aggiornata!' : 'Categoria aggiunta!', 'success');
+      Store.addChangeLog({
+        admin_user_email: 'staff@barfranca.it',
+        action: editingCategory ? 'UPDATE' : 'CREATE',
+        entity_type: 'Category',
+        entity_id: targetCategory.id,
+      });
+    }
   };
 
-  const handleMove = (index: number, direction: 'up' | 'down') => {
+  // ── Reorder (move up / down) ──────────────────────────────────────────
+  const handleMove = async (index: number, direction: 'up' | 'down') => {
     const targetIndex = direction === 'up' ? index - 1 : index + 1;
     if (targetIndex < 0 || targetIndex >= categories.length) return;
 
@@ -115,40 +155,95 @@ export default function CategoryManagementPage() {
       ...c,
       sort_order: i + 1,
     }));
-
-    Store.saveCategories(reordered);
     setCategories(reordered);
-    Store.addChangeLog({
-      admin_user_email: 'staff@barfranca.it',
-      action: 'REORDER',
-      entity_type: 'Category',
-      entity_id: 'all',
-    });
+
+    setSyncing(true);
+    const err = await Store.upsertCategories(reordered);
+    setSyncing(false);
+
+    if (err) {
+      showToast(`Errore riordino: ${err}`, 'error');
+    } else {
+      Store.addChangeLog({
+        admin_user_email: 'staff@barfranca.it',
+        action: 'REORDER',
+        entity_type: 'Category',
+        entity_id: 'all',
+      });
+    }
   };
 
-  const handleDelete = (id: string) => {
-    const updated = categories.filter((c) => c.id !== id);
-    Store.saveCategories(updated);
-    setCategories(updated);
+  // ── Delete ─────────────────────────────────────────────────────────────
+  const handleDelete = async (id: string) => {
+    const previousCategories = categories;
+    setCategories((prev) => prev.filter((c) => c.id !== id));
     setDeleteConfirmId(null);
-    Store.addChangeLog({
-      admin_user_email: 'staff@barfranca.it',
-      action: 'DELETE',
-      entity_type: 'Category',
-      entity_id: id,
-    });
+
+    setSyncing(true);
+    const err = await Store.deleteCategory(id);
+    setSyncing(false);
+
+    if (err) {
+      setCategories(previousCategories); // revert
+      showToast(`Errore eliminazione: ${err}`, 'error');
+    } else {
+      showToast('Categoria eliminata.', 'success');
+      Store.addChangeLog({
+        admin_user_email: 'staff@barfranca.it',
+        action: 'DELETE',
+        entity_type: 'Category',
+        entity_id: id,
+      });
+    }
   };
 
-  const toggleActive = (id: string) => {
-    const updated = categories.map((c) =>
-      c.id === id ? { ...c, active: !c.active } : c
-    );
-    Store.saveCategories(updated);
-    setCategories(updated);
+  // ── Toggle active ─────────────────────────────────────────────────────
+  const toggleActive = async (id: string) => {
+    const cat = categories.find((c) => c.id === id);
+    if (!cat) return;
+    const updated = { ...cat, active: !cat.active };
+    setCategories((prev) => prev.map((c) => (c.id === id ? updated : c)));
+
+    setSyncing(true);
+    const err = await Store.upsertCategory(updated);
+    setSyncing(false);
+
+    if (err) {
+      setCategories((prev) => prev.map((c) => (c.id === id ? cat : c))); // revert
+      showToast(`Errore sincronizzazione: ${err}`, 'error');
+    }
   };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="flex flex-col items-center gap-3 text-stone-500">
+          <Loader2 className="w-7 h-7 animate-spin text-aperitivo-spritz" />
+          <p className="text-xs font-semibold">Caricamento da Supabase...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-4xl mx-auto space-y-5 sm:space-y-6 font-sans">
+      {/* Toast Notification */}
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
+
+      {/* Syncing indicator */}
+      {syncing && (
+        <div className="fixed top-4 right-4 z-[150] flex items-center gap-2 px-3 py-2 bg-stone-900 text-white text-xs font-semibold rounded-xl shadow-lg">
+          <Loader2 className="w-3.5 h-3.5 animate-spin" />
+          Sincronizzazione...
+        </div>
+      )}
+
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
@@ -159,13 +254,22 @@ export default function CategoryManagementPage() {
             Riordina, aggiungi o modifica le sezioni del menu digitale.
           </p>
         </div>
-        <button
-          onClick={handleOpenAdd}
-          className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-4 py-2.5 bg-gradient-to-r from-aperitivo-spritz to-aperitivo-vermilion hover:opacity-95 text-white font-bold text-xs rounded-xl shadow-md transition-all active:scale-95 cursor-pointer"
-        >
-          <Plus className="w-4 h-4" />
-          <span>Nuova Categoria</span>
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={loadData}
+            className="p-2.5 rounded-xl bg-white border border-stone-200 text-stone-500 hover:bg-stone-50 transition-colors shadow-2xs"
+            title="Ricarica dati da Supabase"
+          >
+            <RefreshCw className="w-4 h-4" />
+          </button>
+          <button
+            onClick={handleOpenAdd}
+            className="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 px-4 py-2.5 bg-gradient-to-r from-aperitivo-spritz to-aperitivo-vermilion hover:opacity-95 text-white font-bold text-xs rounded-xl shadow-md transition-all active:scale-95 cursor-pointer"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Nuova Categoria</span>
+          </button>
+        </div>
       </div>
 
       {/* Category List */}
@@ -184,7 +288,7 @@ export default function CategoryManagementPage() {
                 <div className="flex flex-row sm:flex-col gap-1">
                   <button
                     onClick={() => handleMove(index, 'up')}
-                    disabled={index === 0}
+                    disabled={index === 0 || syncing}
                     className="p-1.5 sm:p-1 rounded bg-stone-100 sm:bg-transparent text-stone-600 hover:text-stone-900 disabled:opacity-30"
                     title="Sposta in alto"
                   >
@@ -192,7 +296,7 @@ export default function CategoryManagementPage() {
                   </button>
                   <button
                     onClick={() => handleMove(index, 'down')}
-                    disabled={index === categories.length - 1}
+                    disabled={index === categories.length - 1 || syncing}
                     className="p-1.5 sm:p-1 rounded bg-stone-100 sm:bg-transparent text-stone-600 hover:text-stone-900 disabled:opacity-30"
                     title="Sposta in basso"
                   >
@@ -230,7 +334,8 @@ export default function CategoryManagementPage() {
               <div className="flex items-center justify-between sm:justify-end gap-2 pt-2 sm:pt-0 border-t sm:border-t-0 border-stone-100">
                 <button
                   onClick={() => toggleActive(cat.id)}
-                  className={`px-3 py-1.5 rounded-full text-xs font-bold transition-colors ${
+                  disabled={syncing}
+                  className={`px-3 py-1.5 rounded-full text-xs font-bold transition-colors disabled:opacity-50 ${
                     cat.active
                       ? 'bg-emerald-100 text-emerald-800'
                       : 'bg-stone-200 text-stone-600'
@@ -260,6 +365,12 @@ export default function CategoryManagementPage() {
             </div>
           );
         })}
+
+        {categories.length === 0 && (
+          <div className="p-10 text-center text-stone-400 font-medium text-xs">
+            Nessuna categoria. Aggiungine una con il tasto &quot;Nuova Categoria&quot;.
+          </div>
+        )}
       </div>
 
       {/* Add / Edit Category Modal */}
@@ -329,10 +440,15 @@ export default function CategoryManagementPage() {
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 text-xs font-bold text-white bg-aperitivo-spritz hover:bg-aperitivo-vermilion rounded-xl shadow-md transition-all flex items-center gap-1.5"
+                  disabled={modalSaving}
+                  className="px-5 py-2 text-xs font-bold text-white bg-aperitivo-spritz hover:bg-aperitivo-vermilion rounded-xl shadow-md transition-all flex items-center gap-1.5 disabled:opacity-60"
                 >
-                  <Save className="w-3.5 h-3.5" />
-                  <span>Salva Categoria</span>
+                  {modalSaving ? (
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  ) : (
+                    <Save className="w-3.5 h-3.5" />
+                  )}
+                  <span>{modalSaving ? 'Salvataggio...' : 'Salva Categoria'}</span>
                 </button>
               </div>
             </form>
@@ -348,13 +464,13 @@ export default function CategoryManagementPage() {
               <AlertTriangle className="w-6 h-6" />
             </div>
             <h3 className="text-base font-bold text-stone-900">
-              Confermi l'eliminazione?
+              Confermi l&apos;eliminazione?
             </h3>
             <p className="text-xs text-stone-600 leading-relaxed">
               {items.filter((i) => i.category_id === deleteConfirmId).length > 0
                 ? `Attenzione: ci sono ${
                     items.filter((i) => i.category_id === deleteConfirmId).length
-                  } prodotti associati a questa categoria.`
+                  } prodotti associati a questa categoria. Verranno eliminati automaticamente da Supabase.`
                 : 'Sei sicuro di voler eliminare questa categoria dal menu?'}
             </p>
             <div className="flex items-center justify-center gap-3 pt-2">

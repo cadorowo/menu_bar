@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   Utensils,
   Plus,
@@ -14,11 +14,32 @@ import {
   EyeOff,
   Check,
   Ban,
+  RefreshCw,
+  WifiOff,
+  Loader2,
 } from 'lucide-react';
 import { MenuItem, Category } from '@/lib/types';
 import { Store } from '@/lib/db';
 import { MenuItemModal } from '@/components/admin/MenuItemModal';
 import { AllergenSvgIcon } from '@/components/public/AllergenIcons';
+
+// ─── Inline toast notification ────────────────────────────────────────────────
+function Toast({ message, type, onClose }: { message: string; type: 'success' | 'error'; onClose: () => void }) {
+  useEffect(() => {
+    const t = setTimeout(onClose, 4000);
+    return () => clearTimeout(t);
+  }, [onClose]);
+  return (
+    <div
+      className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-[200] flex items-center gap-2 px-4 py-2.5 rounded-2xl shadow-xl text-xs font-bold text-white transition-all ${
+        type === 'success' ? 'bg-emerald-600' : 'bg-rose-600'
+      }`}
+    >
+      {type === 'success' ? <Check className="w-4 h-4 stroke-[3]" /> : <WifiOff className="w-4 h-4" />}
+      <span>{message}</span>
+    </div>
+  );
+}
 
 export default function MenuItemsManagementPage() {
   const [categories, setCategories] = useState<Category[]>([]);
@@ -28,15 +49,29 @@ export default function MenuItemsManagementPage() {
   const [availabilityFilter, setAvailabilityFilter] = useState<'all' | 'available' | 'sold_out'>('all');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<MenuItem | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [syncing, setSyncing] = useState<string | null>(null); // id of item being synced
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+
+  const showToast = (message: string, type: 'success' | 'error') => {
+    setToast({ message, type });
+  };
+
+  // ── Load: always pull fresh data from Supabase ──────────────────────────
+  const loadData = useCallback(async () => {
+    setLoading(true);
+    const [cats, its] = await Promise.all([
+      Store.fetchCategoriesFromSupabase(true), // adminMode = true → fetch ALL including inactive
+      Store.fetchMenuItemsFromSupabase(true),
+    ]);
+    setCategories(cats.sort((a, b) => a.sort_order - b.sort_order));
+    setItems(its.sort((a, b) => a.sort_order - b.sort_order));
+    setLoading(false);
+  }, []);
 
   useEffect(() => {
     loadData();
-  }, []);
-
-  const loadData = () => {
-    setCategories(Store.getCategories().sort((a, b) => a.sort_order - b.sort_order));
-    setItems(Store.getMenuItems().sort((a, b) => a.sort_order - b.sort_order));
-  };
+  }, [loadData]);
 
   const handleOpenAdd = () => {
     setEditingItem(null);
@@ -48,22 +83,16 @@ export default function MenuItemsManagementPage() {
     setIsModalOpen(true);
   };
 
-  const handleSaveItem = (itemData: Partial<MenuItem>) => {
-    let updatedItems: MenuItem[];
+  // ── Save (add or edit) ─────────────────────────────────────────────────
+  const handleSaveItem = async (itemData: Partial<MenuItem>) => {
+    let targetItem: MenuItem;
+
     if (editingItem) {
-      updatedItems = items.map((i) =>
-        i.id === editingItem.id ? ({ ...i, ...itemData } as MenuItem) : i
-      );
-      Store.addChangeLog({
-        admin_user_email: 'staff@barfranca.it',
-        action: 'UPDATE',
-        entity_type: 'MenuItem',
-        entity_id: editingItem.id,
-      });
+      targetItem = { ...editingItem, ...itemData } as MenuItem;
     } else {
-      const newItem: MenuItem = {
+      targetItem = {
         id: crypto.randomUUID(),
-        category_id: itemData.category_id || categories[0]?.id || 'cat-1',
+        category_id: itemData.category_id || categories[0]?.id || '',
         name: itemData.name || { it: 'Nuovo Piatto' },
         description: itemData.description,
         price: itemData.price || 0,
@@ -73,46 +102,89 @@ export default function MenuItemsManagementPage() {
         sort_order: items.length + 1,
         active: itemData.active !== undefined ? itemData.active : true,
       };
-      updatedItems = [...items, newItem];
-      Store.addChangeLog({
-        admin_user_email: 'staff@barfranca.it',
-        action: 'CREATE',
-        entity_type: 'MenuItem',
-        entity_id: newItem.id,
-      });
     }
 
-    Store.saveMenuItems(updatedItems);
+    // Optimistic UI update
+    const updatedItems = editingItem
+      ? items.map((i) => (i.id === editingItem.id ? targetItem : i))
+      : [...items, targetItem];
     setItems(updatedItems);
+
+    setSyncing(targetItem.id);
+    const err = await Store.upsertMenuItem(targetItem);
+    setSyncing(null);
+
+    if (err) {
+      showToast(`Errore Supabase: ${err}`, 'error');
+    } else {
+      showToast(editingItem ? 'Piatto aggiornato!' : 'Piatto aggiunto!', 'success');
+      Store.addChangeLog({
+        admin_user_email: 'staff@barfranca.it',
+        action: editingItem ? 'UPDATE' : 'CREATE',
+        entity_type: 'MenuItem',
+        entity_id: targetItem.id,
+      });
+    }
   };
 
-  const handleToggleSoldOut = (id: string) => {
-    const updated = items.map((i) =>
-      i.id === id ? { ...i, sold_out: !i.sold_out } : i
-    );
-    Store.saveMenuItems(updated);
-    setItems(updated);
-    Store.addChangeLog({
-      admin_user_email: 'staff@barfranca.it',
-      action: 'TOGGLE_SOLDOUT',
-      entity_type: 'MenuItem',
-      entity_id: id,
-    });
+  // ── Toggle sold-out ────────────────────────────────────────────────────
+  const handleToggleSoldOut = async (id: string) => {
+    const item = items.find((i) => i.id === id);
+    if (!item) return;
+    const updated = { ...item, sold_out: !item.sold_out };
+    setItems((prev) => prev.map((i) => (i.id === id ? updated : i)));
+
+    setSyncing(id);
+    const err = await Store.upsertMenuItem(updated);
+    setSyncing(null);
+
+    if (err) {
+      // Revert on failure
+      setItems((prev) => prev.map((i) => (i.id === id ? item : i)));
+      showToast(`Errore sincronizzazione: ${err}`, 'error');
+    } else {
+      Store.addChangeLog({
+        admin_user_email: 'staff@barfranca.it',
+        action: 'TOGGLE_SOLDOUT',
+        entity_type: 'MenuItem',
+        entity_id: id,
+      });
+    }
   };
 
-  const handleToggleActive = (id: string) => {
-    const updated = items.map((i) =>
-      i.id === id ? { ...i, active: !i.active } : i
-    );
-    Store.saveMenuItems(updated);
-    setItems(updated);
+  // ── Toggle active/visible ─────────────────────────────────────────────
+  const handleToggleActive = async (id: string) => {
+    const item = items.find((i) => i.id === id);
+    if (!item) return;
+    const updated = { ...item, active: !item.active };
+    setItems((prev) => prev.map((i) => (i.id === id ? updated : i)));
+
+    setSyncing(id);
+    const err = await Store.upsertMenuItem(updated);
+    setSyncing(null);
+
+    if (err) {
+      setItems((prev) => prev.map((i) => (i.id === id ? item : i)));
+      showToast(`Errore sincronizzazione: ${err}`, 'error');
+    }
   };
 
-  const handleDelete = (id: string) => {
-    if (confirm('Sei sicuro di voler eliminare questo piatto dal menu?')) {
-      const updated = items.filter((i) => i.id !== id);
-      Store.saveMenuItems(updated);
-      setItems(updated);
+  // ── Delete ─────────────────────────────────────────────────────────────
+  const handleDelete = async (id: string) => {
+    if (!confirm('Sei sicuro di voler eliminare questo piatto dal menu?')) return;
+
+    const previousItems = items;
+    setItems((prev) => prev.filter((i) => i.id !== id));
+
+    setSyncing(id);
+    const err = await Store.deleteMenuItem(id);
+    setSyncing(null);
+
+    if (err) {
+      setItems(previousItems); // revert
+      showToast(`Errore eliminazione: ${err}`, 'error');
+    } else {
+      showToast('Piatto eliminato.', 'success');
       Store.addChangeLog({
         admin_user_email: 'staff@barfranca.it',
         action: 'DELETE',
@@ -122,7 +194,7 @@ export default function MenuItemsManagementPage() {
     }
   };
 
-  // Filter items
+  // ── Filter items ──────────────────────────────────────────────────────
   const filteredItems = items.filter((item) => {
     const matchesCategory =
       selectedCategory === 'all' || item.category_id === selectedCategory;
@@ -141,8 +213,28 @@ export default function MenuItemsManagementPage() {
   const availableCount = items.filter((i) => !i.sold_out).length;
   const soldOutCount = items.filter((i) => i.sold_out).length;
 
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="flex flex-col items-center gap-3 text-stone-500">
+          <Loader2 className="w-7 h-7 animate-spin text-aperitivo-spritz" />
+          <p className="text-xs font-semibold">Caricamento da Supabase...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-6xl mx-auto space-y-5 sm:space-y-6 font-sans">
+      {/* Toast Notification */}
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
+
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
@@ -153,13 +245,22 @@ export default function MenuItemsManagementPage() {
             Aggiorna in tempo reale disponibilità, prezzi, allergeni e foto.
           </p>
         </div>
-        <button
-          onClick={handleOpenAdd}
-          className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-4 py-2.5 bg-gradient-to-r from-aperitivo-spritz to-aperitivo-vermilion hover:opacity-95 text-white font-bold text-xs rounded-xl shadow-md transition-all active:scale-95 cursor-pointer"
-        >
-          <Plus className="w-4 h-4" />
-          <span>Aggiungi Nuovo Piatto</span>
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={loadData}
+            className="p-2.5 rounded-xl bg-white border border-stone-200 text-stone-500 hover:bg-stone-50 transition-colors shadow-2xs"
+            title="Ricarica dati da Supabase"
+          >
+            <RefreshCw className="w-4 h-4" />
+          </button>
+          <button
+            onClick={handleOpenAdd}
+            className="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 px-4 py-2.5 bg-gradient-to-r from-aperitivo-spritz to-aperitivo-vermilion hover:opacity-95 text-white font-bold text-xs rounded-xl shadow-md transition-all active:scale-95 cursor-pointer"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Aggiungi Nuovo Piatto</span>
+          </button>
+        </div>
       </div>
 
       {/* Quick Availability Status Filter Tabs */}
@@ -237,16 +338,23 @@ export default function MenuItemsManagementPage() {
         {filteredItems.map((item) => {
           const category = categories.find((c) => c.id === item.category_id);
           const hasNoAllergens = !item.allergens || item.allergens.length === 0;
+          const isSyncing = syncing === item.id;
 
           return (
             <div
               key={item.id}
-              className={`bg-white p-4 rounded-2xl border transition-all space-y-3 shadow-2xs ${
+              className={`bg-white p-4 rounded-2xl border transition-all space-y-3 shadow-2xs relative ${
                 item.sold_out
                   ? 'border-amber-300 bg-amber-50/20'
                   : 'border-stone-200'
-              }`}
+              } ${isSyncing ? 'opacity-70' : ''}`}
             >
+              {isSyncing && (
+                <div className="absolute top-3 right-3">
+                  <Loader2 className="w-4 h-4 animate-spin text-aperitivo-spritz" />
+                </div>
+              )}
+
               {/* Header: Name, Category, Price & Photo */}
               <div className="flex items-start gap-3">
                 {item.photo_url ? (
@@ -302,13 +410,16 @@ export default function MenuItemsManagementPage() {
                 <button
                   type="button"
                   onClick={() => handleToggleSoldOut(item.id)}
-                  className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-extrabold uppercase transition-all shadow-2xs active:scale-95 cursor-pointer ${
+                  disabled={isSyncing}
+                  className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-extrabold uppercase transition-all shadow-2xs active:scale-95 cursor-pointer disabled:opacity-50 ${
                     item.sold_out
                       ? 'bg-amber-600 hover:bg-amber-700 text-white shadow-amber-600/20'
                       : 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-600/20'
                   }`}
                 >
-                  {item.sold_out ? (
+                  {isSyncing ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : item.sold_out ? (
                     <>
                       <Ban className="w-4 h-4" />
                       <span>Esaurito</span>
@@ -325,7 +436,8 @@ export default function MenuItemsManagementPage() {
                 <div className="flex items-center gap-1">
                   <button
                     onClick={() => handleToggleActive(item.id)}
-                    className="p-2 rounded-xl bg-stone-100 text-stone-600 hover:bg-stone-200 transition-colors"
+                    disabled={isSyncing}
+                    className="p-2 rounded-xl bg-stone-100 text-stone-600 hover:bg-stone-200 transition-colors disabled:opacity-50"
                     title={item.active ? 'Nascondi nel menu' : 'Mostra nel menu'}
                   >
                     {item.active ? (
@@ -343,7 +455,8 @@ export default function MenuItemsManagementPage() {
                   </button>
                   <button
                     onClick={() => handleDelete(item.id)}
-                    className="p-2 rounded-xl bg-rose-50 text-rose-600 hover:bg-rose-100 transition-colors"
+                    disabled={isSyncing}
+                    className="p-2 rounded-xl bg-rose-50 text-rose-600 hover:bg-rose-100 transition-colors disabled:opacity-50"
                     title="Elimina piatto"
                   >
                     <Trash2 className="w-4 h-4" />
@@ -379,13 +492,14 @@ export default function MenuItemsManagementPage() {
               {filteredItems.map((item) => {
                 const category = categories.find((c) => c.id === item.category_id);
                 const hasNoAllergens = !item.allergens || item.allergens.length === 0;
+                const isSyncing = syncing === item.id;
 
                 return (
                   <tr
                     key={item.id}
                     className={`hover:bg-stone-50/70 transition-colors ${
                       item.sold_out ? 'bg-amber-50/30' : ''
-                    }`}
+                    } ${isSyncing ? 'opacity-60' : ''}`}
                   >
                     {/* Name & Photo */}
                     <td className="p-4">
@@ -452,14 +566,17 @@ export default function MenuItemsManagementPage() {
                       <button
                         type="button"
                         onClick={() => handleToggleSoldOut(item.id)}
-                        className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-extrabold uppercase transition-all shadow-2xs active:scale-95 cursor-pointer ${
+                        disabled={isSyncing}
+                        className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-extrabold uppercase transition-all shadow-2xs active:scale-95 cursor-pointer disabled:opacity-50 ${
                           item.sold_out
                             ? 'bg-amber-600 hover:bg-amber-700 text-white shadow-amber-600/20 ring-2 ring-amber-400/30'
                             : 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-600/20'
                         }`}
                         title="Clicca per cambiare immediatamente lo stato esaurito"
                       >
-                        {item.sold_out ? (
+                        {isSyncing ? (
+                          <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                        ) : item.sold_out ? (
                           <>
                             <Ban className="w-3.5 h-3.5" />
                             <span>Esaurito</span>
@@ -478,7 +595,8 @@ export default function MenuItemsManagementPage() {
                       <div className="flex items-center justify-end gap-1.5">
                         <button
                           onClick={() => handleToggleActive(item.id)}
-                          className={`p-1.5 rounded-lg transition-colors ${
+                          disabled={isSyncing}
+                          className={`p-1.5 rounded-lg transition-colors disabled:opacity-50 ${
                             item.active
                               ? 'text-stone-500 hover:bg-stone-100'
                               : 'text-stone-300 hover:bg-stone-100'
@@ -500,7 +618,8 @@ export default function MenuItemsManagementPage() {
                         </button>
                         <button
                           onClick={() => handleDelete(item.id)}
-                          className="p-1.5 text-rose-500 hover:text-rose-700 hover:bg-rose-50 rounded-lg transition-colors"
+                          disabled={isSyncing}
+                          className="p-1.5 text-rose-500 hover:text-rose-700 hover:bg-rose-50 rounded-lg transition-colors disabled:opacity-50"
                           title="Elimina piatto"
                         >
                           <Trash2 className="w-4 h-4" />

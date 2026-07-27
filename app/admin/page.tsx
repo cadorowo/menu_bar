@@ -21,9 +21,16 @@ export default function AdminDashboardOverview() {
   const [logs, setLogs] = useState<ChangeLog[]>([]);
 
   useEffect(() => {
-    setCategories(Store.getCategories());
-    setItems(Store.getMenuItems());
-    setLogs(Store.getChangeLogs());
+    async function loadDashboard() {
+      const [cats, its] = await Promise.all([
+        Store.fetchCategoriesFromSupabase(true),
+        Store.fetchMenuItemsFromSupabase(true),
+      ]);
+      setCategories(cats);
+      setItems(its);
+      setLogs(Store.getChangeLogs());
+    }
+    loadDashboard();
   }, []);
 
   const totalCategories = categories.length;
