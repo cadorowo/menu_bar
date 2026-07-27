@@ -65,7 +65,7 @@ export default function PublicMenuPage() {
         <div className="flex flex-col items-center gap-3">
           <div className="w-9 h-9 border-3 border-aperitivo-spritz border-t-transparent rounded-full animate-spin" />
           <span className="text-xs font-semibold text-aperitivo-muted tracking-wide">
-            Caricamento del Menu Bar Franca...
+            Caricamento del menu Bar Franca...
           </span>
         </div>
       </div>
@@ -78,7 +78,7 @@ export default function PublicMenuPage() {
       <Header onOpenAllergenModal={() => setIsLegendOpen(true)} />
 
       {/* Search & Filter Bar */}
-      <div className="bg-[#FAF7F2]/90 backdrop-blur-md border-b border-aperitivo-border/60 px-5 pt-3 pb-2 max-w-md mx-auto w-full">
+      <div className="bg-[#FAF7F2]/90 backdrop-blur-md border-b border-aperitivo-border/60 px-4 pt-3 pb-1.5 max-w-md mx-auto w-full">
         <div className="relative">
           <Search className="w-4 h-4 text-aperitivo-muted absolute left-3.5 top-1/2 -translate-y-1/2" />
           <input
@@ -97,7 +97,7 @@ export default function PublicMenuPage() {
           {searchQuery && (
             <button
               onClick={() => setSearchQuery('')}
-              className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-stone-400 hover:text-stone-700"
+              className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 text-stone-400 hover:text-stone-700"
             >
               <X className="w-3.5 h-3.5" />
             </button>
@@ -112,8 +112,8 @@ export default function PublicMenuPage() {
         onSelectCategory={handleSelectCategory}
       />
 
-      {/* Main Dishes Container - Spacious Airy Spacing */}
-      <main className="flex-1 max-w-md w-full mx-auto px-0 py-4 space-y-8">
+      {/* Main Dishes Container */}
+      <main className="flex-1 max-w-md w-full mx-auto px-0 py-4 space-y-7">
         {categories.map((category) => {
           if (!isSearching && activeCategoryId !== 'all' && activeCategoryId !== category.id) {
             return null;
@@ -146,12 +146,12 @@ export default function PublicMenuPage() {
             <section
               key={category.id}
               id={`category-${category.id}`}
-              className="pt-5 pb-3 scroll-mt-32"
+              className="pt-4 pb-2 scroll-mt-32"
             >
               {/* Category Title Header */}
-              <div className="px-5 pb-3 flex items-center justify-between border-b border-aperitivo-border/80 mx-5 mb-3">
+              <div className="px-5 pb-3 flex items-center justify-between border-b border-aperitivo-border/80 mx-4 mb-3">
                 <div className="flex items-center gap-2.5">
-                  <span className="w-2.5 h-2.5 rounded-full bg-aperitivo-spritz inline-block" />
+                  <span className="w-2.5 h-2.5 rounded-full bg-aperitivo-spritz inline-block shadow-2xs" />
                   <h2 className="font-serif text-xl font-bold text-aperitivo-slate tracking-tight">
                     {t(category.name)}
                   </h2>
@@ -159,7 +159,7 @@ export default function PublicMenuPage() {
               </div>
 
               {/* Items List */}
-              <div className="space-y-1.5">
+              <div className="space-y-1">
                 {categoryItems.map((item) => (
                   <DishRow key={item.id} item={item} />
                 ))}
@@ -184,7 +184,7 @@ export default function PublicMenuPage() {
                   item.description.fr.toLowerCase().includes(queryClean)));
             return nameMatch || descMatch;
           }).length === 0 && (
-            <div className="p-8 text-center space-y-2">
+            <div className="p-10 text-center space-y-3">
               <p className="text-xs font-semibold text-aperitivo-muted">
                 {locale === 'it'
                   ? 'Nessun piatto trovato per "' + searchQuery + '"'
@@ -194,7 +194,7 @@ export default function PublicMenuPage() {
               </p>
               <button
                 onClick={() => setSearchQuery('')}
-                className="text-xs font-bold text-aperitivo-spritz hover:underline"
+                className="text-xs font-bold text-aperitivo-spritz hover:underline cursor-pointer"
               >
                 {locale === 'it'
                   ? 'Mostra tutti i piatti'

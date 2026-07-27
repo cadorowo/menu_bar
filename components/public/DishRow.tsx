@@ -19,7 +19,7 @@ function AllergenPill({ code }: { code: AllergenCode }) {
 
   return (
     <span
-      className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-aperitivo-linen border border-aperitivo-border text-aperitivo-slate text-[10px] font-bold tracking-tight uppercase hover:bg-amber-100/60 transition-colors"
+      className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-aperitivo-linen border border-aperitivo-border text-aperitivo-slate text-[10px] font-bold tracking-tight uppercase hover:bg-amber-100/60 transition-colors"
       title={t(allergen.label)}
     >
       <span className="text-aperitivo-spritz flex items-center">
@@ -40,7 +40,7 @@ export function DishRow({ item }: DishRowProps) {
   return (
     <article
       onClick={() => !item.sold_out && setExpanded((prev) => !prev)}
-      className={`relative mx-5 my-3.5 bg-white border border-aperitivo-border/80 rounded-2xl p-4.5 shadow-paper transition-all duration-200 ${
+      className={`relative mx-4 my-3 bg-white border border-aperitivo-border/80 rounded-2xl p-4 shadow-paper transition-all duration-200 ${
         item.sold_out
           ? 'opacity-60 bg-stone-100/60 cursor-not-allowed border-dashed'
           : 'cursor-pointer hover:border-aperitivo-spritz/40 hover:shadow-paper-lg active:scale-[0.99]'
@@ -49,23 +49,23 @@ export function DishRow({ item }: DishRowProps) {
       <div className="flex items-start gap-4">
         {/* Optional Thumbnail Photo */}
         {item.photo_url && (
-          <div className="relative w-18 h-18 rounded-xl overflow-hidden flex-shrink-0 border border-aperitivo-border shadow-2xs bg-aperitivo-linen">
+          <div className="relative w-16 h-16 rounded-xl overflow-hidden flex-shrink-0 border border-aperitivo-border shadow-2xs bg-aperitivo-linen">
             <Image
               src={item.photo_url}
               alt={nameText}
               fill
               className="object-cover"
-              sizes="72px"
+              sizes="64px"
               unoptimized
             />
           </div>
         )}
 
         {/* Text & Content Block */}
-        <div className="flex-1 min-w-0">
+        <div className="flex-1 min-w-0 space-y-1.5">
           {/* Line 1: Dish Name + Price */}
-          <div className="flex items-baseline justify-between gap-3">
-            <h3 className="text-base font-bold text-aperitivo-slate leading-snug truncate">
+          <div className="flex items-baseline justify-between gap-2">
+            <h3 className="text-sm font-bold text-aperitivo-slate leading-snug truncate">
               {nameText}
             </h3>
             <div className="flex items-center gap-1.5 flex-shrink-0">
@@ -74,7 +74,7 @@ export function DishRow({ item }: DishRowProps) {
                   {locale === 'it' ? 'Esaurito' : locale === 'fr' ? 'Épuisé' : 'Sold Out'}
                 </span>
               ) : (
-                <span className="font-serif text-base font-bold text-aperitivo-spritz tracking-tight">
+                <span className="font-serif text-sm font-bold text-aperitivo-spritz tracking-tight">
                   € {item.price.toFixed(2)}
                 </span>
               )}
@@ -82,7 +82,7 @@ export function DishRow({ item }: DishRowProps) {
           </div>
 
           {/* Line 2: Allergen Badges & Accordion Indicator */}
-          <div className="flex items-center justify-between mt-2.5">
+          <div className="flex items-center justify-between pt-0.5">
             <div className="flex items-center gap-1.5 flex-wrap">
               {item.allergens && item.allergens.length > 0 ? (
                 item.allergens.map((allergen) => (
@@ -100,7 +100,7 @@ export function DishRow({ item }: DishRowProps) {
             </div>
 
             {descriptionText && !item.sold_out && (
-              <span className="text-stone-400 p-1 ml-2">
+              <span className="text-stone-400 p-0.5 ml-2">
                 <ChevronDown
                   className={`w-4 h-4 transition-transform duration-200 ${
                     expanded ? 'rotate-180 text-aperitivo-spritz' : ''
@@ -112,7 +112,7 @@ export function DishRow({ item }: DishRowProps) {
 
           {/* Expanded Description Accordion */}
           {expanded && descriptionText && !item.sold_out && (
-            <div className="mt-3 pt-3 border-t border-aperitivo-border/60 text-xs leading-relaxed text-aperitivo-muted font-normal">
+            <div className="mt-3 pt-2.5 border-t border-aperitivo-border/60 text-xs leading-relaxed text-aperitivo-muted font-normal">
               <p>{descriptionText}</p>
             </div>
           )}
