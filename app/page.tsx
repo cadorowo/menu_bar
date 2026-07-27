@@ -35,7 +35,10 @@ export default function PublicMenuPage() {
 
   const handleSelectCategory = (id: string) => {
     setActiveCategoryId(id);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    // Defer scroll to top so React completes layout re-rendering first
+    setTimeout(() => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }, 15);
   };
 
   // Filter items by search query if typed
