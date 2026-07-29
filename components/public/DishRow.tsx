@@ -47,7 +47,7 @@ export function DishRow({ item }: DishRowProps) {
     <>
       <article
         onClick={() => !item.sold_out && setExpanded((prev) => !prev)}
-        className={`relative mx-4 my-3 bg-white border border-aperitivo-border/80 rounded-2xl p-4 shadow-paper transition-all duration-200 ${
+        className={`relative w-full bg-white border border-aperitivo-border/80 rounded-2xl p-4 shadow-paper transition-all duration-200 ${
           item.sold_out
             ? 'opacity-60 bg-stone-100/60 cursor-not-allowed border-dashed'
             : 'cursor-pointer hover:border-aperitivo-spritz/40 hover:shadow-paper-lg active:scale-[0.99]'

@@ -104,7 +104,7 @@ export default function PublicMenuPage() {
       </div>
 
       {/* Main Dishes Container */}
-      <main className="flex-1 max-w-md w-full mx-auto px-0 py-3 space-y-7">
+      <main className="flex-1 max-w-md w-full mx-auto px-0 pt-2 pb-6 space-y-6">
         {categories.map((category) => {
           if (!isSearching && activeCategoryId !== 'all' && activeCategoryId !== category.id) {
             return null;
@@ -137,10 +137,10 @@ export default function PublicMenuPage() {
             <section
               key={category.id}
               id={`category-${category.id}`}
-              className="pt-3 pb-1 scroll-mt-36"
+              className="scroll-mt-36"
             >
               {/* Category Title Header */}
-              <div className="px-5 pb-3 flex items-center justify-between border-b border-aperitivo-border/80 mx-4 mb-3">
+              <div className="px-5 pb-2 flex items-center justify-between border-b border-aperitivo-border/80 mx-4 mb-2.5">
                 <div className="flex items-center gap-2.5">
                   <span className="w-2.5 h-2.5 rounded-full bg-aperitivo-spritz inline-block shadow-2xs" />
                   <h2 className="font-serif text-xl font-bold text-aperitivo-slate tracking-tight">
@@ -149,8 +149,8 @@ export default function PublicMenuPage() {
                 </div>
               </div>
 
-              {/* Items List */}
-              <div className="space-y-1">
+              {/* Items List - Clean 12px (space-y-3) gap between dish cards */}
+              <div className="px-4 space-y-3">
                 {categoryItems.map((item) => (
                   <DishRow key={item.id} item={item} />
                 ))}
